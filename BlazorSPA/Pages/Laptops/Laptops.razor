@@ -1,0 +1,70 @@
+﻿@page "/laptops"
+
+
+@using System.Net.Http
+@using System.Net.Http.Json
+
+@inject HttpClient Http
+
+<h3>Laptops</h3>
+
+<div class="">
+    <a class="btn btn-success" href="alta-laptop">Alta Laptop</a>
+</div>
+
+<table class="table">
+    @if (devices == null)
+    {
+        <text>Cargando...</text>
+    }
+    else if (devices.Count.Equals(0))
+    {
+        <text>No existen laptops en la base de datos...</text>
+    }
+    else
+    {
+        <thead>
+            <tr>
+                <th>Acciones</th>
+                <th scope="col">#</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Marca</th>
+                <th scope="col">Color</th>
+                <th scope="col">Procesador</th>
+                <th scope="col">Ram</th>
+                <th scope="col">HDD</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var laptop in devices)
+            {
+                <tr>
+                    <td width="25%"><Buttons /></td>
+                    <td>@laptop.Id</td>
+                    <td>@laptop.Name</td>
+                    <td>@laptop.Brand</td>
+                    <td>@laptop.Color</td>
+                    <td>@laptop.Processor</td>
+                    <td>@laptop.Ram</td>
+                    <td>@laptop.HDD</td>
+                </tr>
+            }
+        </tbody>
+    }
+
+</table>
+
+@code {
+    public string Url = "/api/Laptops";
+
+    public List<Laptop> devices = new();
+    protected override async Task OnInitializedAsync() => await LoadLaptops();
+
+
+
+    async Task LoadLaptops()
+    {
+        devices = await Http.GetFromJsonAsync<List<Laptop>>(Url);
+    }
+
+}

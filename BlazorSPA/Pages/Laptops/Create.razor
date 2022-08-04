@@ -1,0 +1,33 @@
+﻿@page "/alta-laptop"
+
+<h3>Nueva Laptop</h3>
+
+<EditForm Model="@laptop" OnValidSubmit="@CreateLaptop">
+    <div class="form-field">
+        <label>Nombre:</label>
+        <div>
+            <InputText @bind-Value="@laptop.Name"/>
+            <ValidationMessage For="@(() => laptop.Name)"/>
+            <InputText @bind-Value="@laptop.Brand"/>
+            <ValidationMessage For="@(() => laptop.Brand)"/>
+            <InputText @bind-Value="@laptop.Color"/>
+            <ValidationMessage For="@(() => laptop.Color)"/>
+            <InputText @bind-Value="@laptop.Processor"/>
+            <ValidationMessage For="@(() => laptop.Processor)"/>
+            <InputText @bind-Value="@laptop.Ram"/>
+            <ValidationMessage For="@(() => laptop.Ram)"/>
+            <InputText @bind-Value="@laptop.HDD"/>
+            <ValidationMessage For="@(() => laptop.HDD)"/>
+        </div>
+    </div>
+    <button type="submit">Guardar</button>
+</EditForm>
+
+@code {
+    Laptop laptop = new();
+    
+    async Task CreateLaptop()
+    {
+        
+    }
+}
