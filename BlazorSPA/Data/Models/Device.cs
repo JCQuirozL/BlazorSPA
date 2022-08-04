@@ -8,19 +8,20 @@ namespace BlazorSPA.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        
+        [Required(ErrorMessage = "{0} es requerido")]
         [MaxLength(100)]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerido")]
         [MaxLength(100)]
         public string Brand { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerido")]
         [MaxLength(20)]
         public string Color { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerido")]
         public decimal Price { get; set; }
 
         public abstract decimal GetPrice();

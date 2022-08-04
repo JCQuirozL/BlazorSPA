@@ -1,0 +1,68 @@
+﻿
+
+<EditForm Model="@Laptop" OnValidSubmit="@EnviarCambios">
+    <div class="col-3">
+
+        <div class="mb-3">
+            <label class="form-label">Nombre:</label>
+            <InputText @bind-Value="@Laptop.Name" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Name)" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Marca:</label>
+            <InputText @bind-Value="@Laptop.Brand" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Brand)" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Color:</label>
+            <InputText @bind-Value="@Laptop.Color" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Color)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Procesador:</label>
+            <InputText @bind-Value="@Laptop.Processor" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Processor)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Memoria RAM:</label>
+            <InputText @bind-Value="@Laptop.Ram" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Ram)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Disco Duro:</label>
+            <InputText @bind-Value="@Laptop.HDD" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.HDD)" />
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label">Pantalla | Monitor:</label>
+            <InputNumber @bind-Value="@Laptop.Screen" class="form-control" />
+            <ValidationMessage For="@(() =>  Laptop.Screen)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Precio:</label>
+            <InputNumber @bind-Value="@Laptop.Price" class="form-control" />
+            <ValidationMessage For="@(() => Laptop.Price)" />
+        </div>
+
+    </div>
+
+    <div class="col-3">
+        <button class="btn btn-success mb-3" type="submit">Guardar</button>
+        <a class="btn btn-outline-danger mb-3" href="laptops">Cancelar</a>
+    </div>
+    <DataAnnotationsValidator />
+</EditForm>
+
+@code {
+    [Parameter]
+    public Laptop Laptop { get; set; } = new();
+
+    [Parameter]
+    public EventCallback EnviarCambios { get; set; }  
+}

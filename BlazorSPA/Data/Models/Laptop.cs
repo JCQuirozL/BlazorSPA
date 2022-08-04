@@ -6,19 +6,19 @@ namespace BlazorSPA.Models
     using System.ComponentModel.DataAnnotations;
     public class Laptop : Device
     {
-        [Required]
+        [Required(ErrorMessage ="{0} es requerid@")]
         [MaxLength(100)]
         public string Processor { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerid@")]
         [MaxLength(20)]
         public string Ram { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerid@")]
         [MaxLength(50)]
         public string HDD { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} es requerid@")]
         public int Screen { get; set; }
         public float Discount { get; set; }
 

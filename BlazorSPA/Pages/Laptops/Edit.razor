@@ -1,0 +1,27 @@
+﻿@page "/editar-laptop/{IdLaptop:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h3>Editar laptop</h3>
+
+<FormularioLaptops EnviarCambios="@EditarLaptop" Laptop="@laptop"/>
+
+@code {
+    [Parameter]
+    public int IdLaptop { get; set; }
+
+    public static string Url = $"api/Laptops";
+
+    Laptop laptop = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        laptop = await Http.GetFromJsonAsync<Laptop>($"{Url}/{IdLaptop}");
+    }
+
+    public async Task EditarLaptop()
+    {
+        await Http.PutAsJsonAsync($"{Url}/{IdLaptop}", laptop);
+        NavigationManager.NavigateTo("laptops");
+    }
+
+}
