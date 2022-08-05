@@ -5,7 +5,7 @@
 @using System.Net.Http.Json
 
 @inject HttpClient Http
-
+@inject IJSRuntime JS
 <h3>Laptops</h3>
 
 <div class="">
@@ -42,8 +42,8 @@
                     <td width="25%">
                         <div>
                             <a class="btn btn-info" href="editar-laptop/@laptop.Id">Editar</a>
-                            <a class="btn btn-danger">Borrar</a>
-                            <a class="btn btn-success">Detalle</a>
+                            <a class="btn btn-danger" @onclick="@(()=>DeleteLaptop(laptop.Id))">Borrar</a>
+                            <a class="btn btn-success" href="detalle-laptop/@laptop.Id">Detalle</a>
                         </div>
                     </td>
                     <td>@laptop.Id</td>
@@ -71,6 +71,19 @@
     async Task LoadLaptops()
     {
         devices = await Http.GetFromJsonAsync<List<Laptop>>(Url);
+    }
+
+    async Task DeleteLaptop(int IdLaptop)
+    {
+        
+        var laptopSeleccionada = devices.First(x => x.Id == IdLaptop);
+        string Mensaje = $"Deseas borrar a {laptopSeleccionada.Name}?";
+        if (await JS.Confirm("Confirmar", Mensaje,TipoSweetAlert.question))
+        {
+            await Http.DeleteAsync($"{Url}/{IdLaptop}");
+            await LoadLaptops();
+
+        }
     }
 
 }

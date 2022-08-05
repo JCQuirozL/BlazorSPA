@@ -1,0 +1,70 @@
+﻿@page "/detalle-laptop/{IdLaptop:int}"
+@inject HttpClient Http
+<h3>Detalle de Laptop @IdLaptop </h3>
+
+<div class="col-3">
+
+    <div class="mb-3">
+        <strong><label class="form-label">Nombre:</label></strong>
+        <label class="form-label">@Laptop.Name</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">Marca:</label> </strong>
+        <label class="form-label">@Laptop.Brand</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">Color:</label></strong>
+        <label class="form-label">@Laptop.Color</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">Procesador:</label> </strong>
+        <label class="form-label">@Laptop.Processor</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">RAM:</label></strong>
+        <label class="form-label">@Laptop.Ram</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">Disco duro:</label></strong>
+        <label class="form-label">@Laptop.HDD</label>
+    </div>
+
+    <div class="mb-3">
+        <strong><label class="form-label">Pantalla | Monitor:</label></strong>
+        <label class="form-label">@Laptop.Screen</label>
+    </div>
+
+    
+    <div class="mb-3">
+        <strong><label class="form-label">Precio:</label></strong>
+        <label class="form-label">@Laptop.Price</label>
+    </div>
+
+    <div class="col-3">
+        <a class="btn btn-warning mb-3" href="laptops">Regresar</a>
+    </div>
+    
+
+</div>
+
+@code {
+    [Parameter]
+    public int IdLaptop { get; set; }
+
+    Laptop Laptop = new();
+
+    string Url = $"api/Laptops";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Laptop = await Http.GetFromJsonAsync<Laptop>($"{Url}/{IdLaptop}");
+    }
+
+
+
+}
