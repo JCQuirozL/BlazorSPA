@@ -1,0 +1,83 @@
+﻿@*<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Portal Pólizas</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <Span class="oi oi-document" aria-hidden="true" TextColor="TextColor.Default"></Span> Pólizas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-wrench" aria-hidden="true"></span> Configuración
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-account-logout" aria-hidden="true"></span> Salir
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
+*@
+
+            <Sidebar Background="@miColor" @ref="sidebar">
+    <SidebarContent>
+        <SidebarBrand>
+            <a href="#">Portal Pólizas</a>
+        </SidebarBrand>
+        <SidebarNavigation>
+            <SidebarLabel>Bienvenido</SidebarLabel>
+            <SidebarItem>
+                <SidebarLink To="#" Title="Home">
+                    <Icon Name="IconName.Book" Margin="Margin.Is3.FromEnd" />Pólizas
+                </SidebarLink>
+            </SidebarItem>
+            <SidebarItem>
+                <SidebarLink To="#" Title="Configuration">
+                    <Icon Name="IconName.Wrench" Margin="Margin.Is3.FromEnd" />Configuración
+                </SidebarLink>
+                    @* other subitems *@
+            </SidebarItem>
+            <SidebarItem>
+                <SidebarLink Toggled="(isOpen)=> appsSidebarSubItems.Toggle(isOpen)" IsShow>
+                    <Icon Name="IconName.Smartphone" Margin="Margin.Is3.FromEnd" />Apps
+                </SidebarLink>
+                <SidebarSubItem @ref="appsSidebarSubItems" IsShow>
+                    <SidebarItem>
+                        <SidebarLink To="#apps/todo">Todo List</SidebarLink>
+                    </SidebarItem>
+                </SidebarSubItem>
+            </SidebarItem>
+        </SidebarNavigation>
+    </SidebarContent>
+</Sidebar>
+@code{
+    Sidebar sidebar;
+    SidebarSubItem mailSidebarSubItems;
+    SidebarSubItem appsSidebarSubItems;
+
+    static readonly Background miColor = "#FFFFFF";
+    void ToggleSidebar()
+    {
+        sidebar.Toggle();
+    }
+}

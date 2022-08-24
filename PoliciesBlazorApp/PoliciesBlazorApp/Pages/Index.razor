@@ -1,0 +1,84 @@
+﻿@page "/"
+@using PoliciesBlazorApp.Models
+@using System.Net.Http
+
+@inject HttpClient Http
+
+<PageTitle>Pólizas</PageTitle>
+
+<h3>Pólizas por cobrar</h3>
+
+<div class="table-responsive">
+    <table class="table table-res align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Póliza</th>
+                <th scope="col">Prima Total</th>
+                <th scope="col">Fecha Validación</th>
+                <th scope="col"> Folio Pago</th>
+                <th scope="col">Banco</th>
+                <th scope="col">No. Cuenta</th>
+                <th scope="col">Fecha Documento</th>
+                <th scope="col">Importe Depósito</th>
+                <th scope="col">Referencia</th>
+                <th scope="col">No. Cert.</th>
+                <th scope="col">No. Fact</th>
+                <th scope="col">Fecha envío ASE</th>
+                <th scope="col">Centro Emisor</th>
+                <th scope="col">Comentarios</th>
+                <th scope="col">Validada</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var policy in PoliciesList)
+            {
+                <tr>
+                    <td>@policy.policy</td>
+                    <td>@policy.totalPremium</td>
+                    <td>@policy.validationDate</td>
+                    <td><input style="width:6rem;" value="@policy.paymentFolio" /></td>
+                    <td><input style="width:6rem;" value="@policy.bank"></td>
+                    <td><input style="width:8rem;" value="@policy.accountNumber"> </td>
+                    <td><input type="date" value="@policy.issueDate.ToString("yyyy/MM/dd")"></td>
+                    <td><input style="width:6rem;" value="@policy.depositAmount" type="number"></td>
+                    <td>@policy.reference</td>
+                    <td>@policy.certificate</td>
+                    <td>@policy.invoice</td>
+                    <td>@policy.infoDate</td>
+                    <td>@policy.emmiterCenter</td>
+                    <td width="20%"><div><Button Color="Color.Info">Ver</Button></div></td>
+                    <td><input type="checkbox" checked="@policy.validated"></td>
+                    <td width="25%">
+                        <div><a class="btn btn-success">Validar</a></div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@*Welcome to your new app.*@
+
+@*<SurveyPrompt Title="How is Blazor working for you?" />*@
+
+@code {
+    public string Url = "/api/PoliciesCollection";
+
+    public List<PoliciesCollectionVM> PoliciesList = new();
+
+    protected override async Task OnInitializedAsync() => await LoadPoliciesAsync();
+
+    async Task LoadPoliciesAsync()
+    {
+        try
+        {
+            PoliciesList = await Http.GetFromJsonAsync<List<PoliciesCollectionVM>>(Url);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+    }
+}
