@@ -60,6 +60,8 @@ namespace LeerCSV
                 var csvContext = new CsvContext();
                 var collection = csvContext.Read<GetPolicyInfoVM>("C:\\Users\\XMX7686\\Desktop\\file.csv", fileDescription);
 
+
+
                 List<string> Params = new();
                 foreach (var policy in collection)
                 {
