@@ -1,4 +1,4 @@
-﻿namespace APICollection.Models
+﻿namespace APICollection.ViewModels
 {
     public class GetPolicyInfoVM
     {

@@ -2,15 +2,15 @@
 
 namespace APICollection.Controllers
 {
-    using APICollection.Data;
-    using APICollection.Entities;
-    using APICollection.Models;
     using APICollection.Repository.Interfaces;
+    using APICollection.Responses;
+    using APICollection.ViewModels;
     using Microsoft.AspNetCore.Mvc;
     using System.Threading.Tasks;
 
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class PoliciesCollectionController : ControllerBase
     {
         private readonly IPCRepository repository;
@@ -21,35 +21,29 @@ namespace APICollection.Controllers
 
         }
 
+        /// <summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="policy"></param>
+        /// <param name="validation"></param>
+        /// </summary>
+        /// <returns></returns>
+
         // GET: api/PoliciesCollection
         [HttpGet]
-        public async Task<IEnumerable<ReiceivablePolicy>> GetPoliciesCollection()
+        [ProducesResponseType(500, StatusCode = 500, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(404, StatusCode = 404, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(401, StatusCode = 401, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(400, StatusCode = 400, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(200, StatusCode = 204, Type = typeof(ServiceResult))]
+        [ProducesResponseType(200, StatusCode = 200, Type = typeof(ServiceResult))]
+
+        public async Task<IEnumerable<BillingData>> GetPoliciesCollection([FromQuery] DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation)
         {
-             return await repository.GetPoliciesAsync();
-            
+            return await repository.GetPoliciesAsync(startDate, endDate, policy, validation);
+
         }
 
-        [HttpGet("Get")]
-        public async Task<IEnumerable<PolicyCollection>> Get()
-        {
-            return await repository.Get();
-
-        }
-
-
-
-        //// GET: api/PoliciesCollection/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<PolicyCollection>> GetPolicyCollection(int id)
-        //{
-        //    var policyCollection = await PCRepository.GetPolicyCollectionAsync(id);
-
-        //    if (policyCollection == null)
-        //    {
-        //        return NotFound("No registers found in Database");
-        //    }
-        //    return policyCollection;
-        //}
 
         //// PUT: api/PoliciesCollection/5
         //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -97,25 +91,6 @@ namespace APICollection.Controllers
         //    return CreatedAtAction("GetPolicyCollection", new { id = policyCollection.PolicyCollectionId }, policyCollection);
         //}
 
-        //// DELETE: api/PoliciesCollection/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeletePolicyCollection(int id)
-        //{
-        //    if (context.PoliciesCollection == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var policyCollection = await context.PoliciesCollection.FindAsync(id);
-        //    if (policyCollection == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    context.PoliciesCollection.Remove(policyCollection);
-        //    await context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
 
         //private bool PolicyCollectionExists(int id)
         //{

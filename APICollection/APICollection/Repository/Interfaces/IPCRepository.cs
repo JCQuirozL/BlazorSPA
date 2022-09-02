@@ -1,14 +1,20 @@
-﻿using APICollection.Entities;
-using APICollection.Models;
-
-namespace APICollection.Repository.Interfaces
+﻿namespace APICollection.Repository.Interfaces
 {
+    using APICollection.Responses;
     public interface IPCRepository
-    {
-        public Task<PolicyCollection> GetPolicyCollectionAsync(int id);
+    {        
+        /// <summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="policy"></param>
+        /// <param name="validation"></param>
+        /// </summary>
+        /// <returns></returns>
+        /// 
 
-        public Task <List<ReiceivablePolicy>> GetPoliciesAsync();
+        //With date, policy number and validation status
+        public Task <List<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation);
 
-        public Task<List<PolicyCollection>> Get();
+
     }
 }
