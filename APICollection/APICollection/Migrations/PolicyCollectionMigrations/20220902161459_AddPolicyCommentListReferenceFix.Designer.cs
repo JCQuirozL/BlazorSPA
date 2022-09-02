@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220902161459_AddPolicyCommentListReferenceFix")]
+    partial class AddPolicyCommentListReferenceFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +82,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(30)");
 
-                    b.Property<int?>("PolicyCollectionId")
+                    b.Property<int>("PolicyColId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
@@ -89,7 +91,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
 
                     b.HasKey("CommentId");
 
-                    b.HasIndex("PolicyCollectionId");
+                    b.HasIndex("PolicyColId");
 
                     b.ToTable("PolicyComments");
                 });
@@ -201,9 +203,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
 
             modelBuilder.Entity("APICollection.Entities.PolicyComment", b =>
                 {
-                    b.HasOne("APICollection.Entities.PolicyCollection", null)
+                    b.HasOne("APICollection.Entities.PolicyCollection", "PolicyCollection")
                         .WithMany("Comments")
-                        .HasForeignKey("PolicyCollectionId");
+                        .HasForeignKey("PolicyColId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PolicyCollection");
                 });
 
             modelBuilder.Entity("APICollection.Entities.PolicyCollection", b =>

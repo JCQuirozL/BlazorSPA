@@ -1,149 +1,125 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using APICollection.Data;
-using APICollection.Models;
-using APICollection.Repository.Interfaces;
+﻿
 
 namespace APICollection.Controllers
 {
+    using APICollection.Data;
+    using APICollection.Entities;
+    using APICollection.Models;
+    using APICollection.Repository.Interfaces;
+    using Microsoft.AspNetCore.Mvc;
+    using System.Threading.Tasks;
+
     [Route("api/[controller]")]
     [ApiController]
     public class PoliciesCollectionController : ControllerBase
     {
-        private readonly IPCRepository PCRepository;
-        private readonly PolicyCollectionDbContext context;
+        private readonly IPCRepository repository;
 
-        public PoliciesCollectionController(IPCRepository PCRepository, PolicyCollectionDbContext context)
+        public PoliciesCollectionController(IPCRepository repository)
         {
-            this.context = context;
-            this.PCRepository = PCRepository;
+            this.repository = repository;
+
         }
 
         // GET: api/PoliciesCollection
         [HttpGet]
-        public async Task <ActionResult<PolicyCollection>> GetPoliciesCollection()
+        public async Task<IEnumerable<ReiceivablePolicy>> GetPoliciesCollection()
         {
-            if (context.PoliciesCollection == null)
-            {
-                return NotFound();
-            }
-
-            //PIService => Leasing
-            //PCFile => Clipert
-
-            var policiesList = await (from policyCollection in context.PoliciesCollection
-                                join PCFile in context.PolicyCollectionFile on policyCollection.PolicyFileId equals PCFile.PolicyFileId
-                                join PIService in context.PolicyInformationService on policyCollection.PolicyInfoId equals PIService.PolicyInfoId join PComments in context.PolicyComments on policyCollection.PolicyCollectionId equals PComments.PolicyColId
-                                select new
-                                {
-                                    policy = PCFile.Policy,
-                                    totalPremium = PCFile.TotalPremium,
-                                    validationDate = policyCollection.ValidationDate,
-                                    paymentFolio = PIService.PaymentFolio,
-                                    bank = PIService.Bank,
-                                    accountNumber = policyCollection.AccountNumber,
-                                    issueDate = PIService.IssueDate,
-                                    depositAmount = policyCollection.DepositAmount,
-                                    reference = PCFile.Reference,
-                                    certificate = PCFile.Certificate,
-                                    invoice = PCFile.Invoice,
-                                    infoDate = PCFile.InfoDate,
-                                    emmiterCenter = PCFile.EmitterCenter,
-                                    comments = PComments.Comment,
-                                    validated=policyCollection.Validated
-                                }).ToListAsync();
-            //return await context.PoliciesCollection.ToListAsync();
-
-            return Ok(policiesList);
+             return await repository.GetPoliciesAsync();
+            
         }
 
-        // GET: api/PoliciesCollection/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PolicyCollection>> GetPolicyCollection(int id)
+        [HttpGet("Get")]
+        public async Task<IEnumerable<PolicyCollection>> Get()
         {
-            var policyCollection = await PCRepository.GetPolicyCollectionAsync(id);
+            return await repository.Get();
 
-            if (policyCollection == null)
-            {
-                return NotFound("No registers found in Database");
-            }
-            return policyCollection;
         }
 
-        // PUT: api/PoliciesCollection/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPolicyCollection(int id, PolicyCollection policyCollection)
-        {
-            if (id != policyCollection.PolicyCollectionId)
-            {
-                return BadRequest();
-            }
 
-            context.Entry(policyCollection).State = EntityState.Modified;
 
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PolicyCollectionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //// GET: api/PoliciesCollection/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<PolicyCollection>> GetPolicyCollection(int id)
+        //{
+        //    var policyCollection = await PCRepository.GetPolicyCollectionAsync(id);
 
-            return NoContent();
-        }
+        //    if (policyCollection == null)
+        //    {
+        //        return NotFound("No registers found in Database");
+        //    }
+        //    return policyCollection;
+        //}
 
-        // POST: api/PoliciesCollection
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<PolicyCollection>> PostPolicyCollection(PolicyCollection policyCollection)
-        {
-            if (context.PoliciesCollection == null)
-            {
-                return Problem("Entity set 'PolicyCollectionDbContext.PoliciesCollection'  is null.");
-            }
-            context.PoliciesCollection.Add(policyCollection);
-            await context.SaveChangesAsync();
+        //// PUT: api/PoliciesCollection/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutPolicyCollection(int id, PolicyCollection policyCollection)
+        //{
+        //    if (id != policyCollection.PolicyCollectionId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            return CreatedAtAction("GetPolicyCollection", new { id = policyCollection.PolicyCollectionId }, policyCollection);
-        }
+        //    context.Entry(policyCollection).State = EntityState.Modified;
 
-        // DELETE: api/PoliciesCollection/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePolicyCollection(int id)
-        {
-            if (context.PoliciesCollection == null)
-            {
-                return NotFound();
-            }
-            var policyCollection = await context.PoliciesCollection.FindAsync(id);
-            if (policyCollection == null)
-            {
-                return NotFound();
-            }
+        //    try
+        //    {
+        //        await context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!PolicyCollectionExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            context.PoliciesCollection.Remove(policyCollection);
-            await context.SaveChangesAsync();
+        //    return NoContent();
+        //}
 
-            return NoContent();
-        }
+        //// POST: api/PoliciesCollection
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<PolicyCollection>> PostPolicyCollection(PolicyCollection policyCollection)
+        //{
+        //    if (context.PoliciesCollection == null)
+        //    {
+        //        return Problem("Entity set 'PolicyCollectionDbContext.PoliciesCollection'  is null.");
+        //    }
+        //    context.PoliciesCollection.Add(policyCollection);
+        //    await context.SaveChangesAsync();
 
-        private bool PolicyCollectionExists(int id)
-        {
-            return (context.PoliciesCollection?.Any(e => e.PolicyCollectionId == id)).GetValueOrDefault();
-        }
+        //    return CreatedAtAction("GetPolicyCollection", new { id = policyCollection.PolicyCollectionId }, policyCollection);
+        //}
+
+        //// DELETE: api/PoliciesCollection/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeletePolicyCollection(int id)
+        //{
+        //    if (context.PoliciesCollection == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var policyCollection = await context.PoliciesCollection.FindAsync(id);
+        //    if (policyCollection == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    context.PoliciesCollection.Remove(policyCollection);
+        //    await context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
+
+        //private bool PolicyCollectionExists(int id)
+        //{
+        //    return (context.PoliciesCollection?.Any(e => e.PolicyCollectionId == id)).GetValueOrDefault();
+        //}
     }
 }

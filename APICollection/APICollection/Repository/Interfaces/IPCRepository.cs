@@ -1,4 +1,5 @@
-﻿using APICollection.Models;
+﻿using APICollection.Entities;
+using APICollection.Models;
 
 namespace APICollection.Repository.Interfaces
 {
@@ -6,6 +7,8 @@ namespace APICollection.Repository.Interfaces
     {
         public Task<PolicyCollection> GetPolicyCollectionAsync(int id);
 
+        public Task <List<ReiceivablePolicy>> GetPoliciesAsync();
 
+        public Task<List<PolicyCollection>> Get();
     }
 }
