@@ -15,6 +15,44 @@ namespace APICollection.Repository
             this.context = context;
         }
 
+        public async Task<List<BillingData>> GatheringBillingData()
+        
+            => await context.PoliciesCollection
+                 .Include(policy => policy.Comments)
+                 .Include(policy => policy.PolicyCollectionFile)
+                 .Include(policy => policy.PolicyInformationService)
+                 .Select(policy => new BillingData
+                 {
+                     policy = policy.PolicyCollectionFile.Policy,
+                     clipert = new ClipertData
+                     {
+                         TotalPremium = policy.PolicyCollectionFile.TotalPremium,
+                         Reference = policy.PolicyCollectionFile.Reference,
+                         Certificate = policy.PolicyCollectionFile.Certificate,
+                         Invoice = policy.PolicyCollectionFile.Invoice,
+                         InfoDate = policy.PolicyCollectionFile.InfoDate,
+                         EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
+                     },
+                     leasing = new LeasingData
+                     {
+                         ValidationDate = policy.ValidationDate,
+                         PaymentFolio = policy.PolicyInformationService.PaymentFolio,
+                         Bank = policy.PolicyInformationService.Bank,
+                         AccountNumber = policy.AccountNumber,
+                         IssueDate = policy.PolicyInformationService.IssueDate,
+                         DepositAmount = policy.DepositAmount,
+                     },
+                     validated = policy.Validated,
+                     comments = policy.Comments.Select(policyComment => new PolicyCommentVM
+                     {
+                         CommentType = policyComment.CommentType,
+                         Comment = policyComment.Comment,
+                         User = policyComment.UserName,
+                         CommentDate = policyComment.CommentDate
+                     }).ToList()
+                 }).ToListAsync();
+
+
         /// <summary>
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
@@ -25,285 +63,65 @@ namespace APICollection.Repository
         /// 
 
 
-        public async Task<List<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation)
+        public async Task<IEnumerable<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation)
         {
             //PIService => Leasing
             //PCFile => Clipert
 
+            List<BillingData> billingData = await GatheringBillingData();
+
             //All params
             if ((startDate != null) && (endDate != null) && (policy != null) && (validation != null))
             {
-                return await context.PoliciesCollection
-                .Include(policy => policy.Comments)
-                .Include(policy => policy.PolicyCollectionFile)
-                .Include(policy => policy.PolicyInformationService)
-                .Select(policy => new BillingData
-                {
-                    policy = policy.PolicyCollectionFile.Policy,
-                    clipert = new ClipertData
-                    {
-                        TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                        Reference = policy.PolicyCollectionFile.Reference,
-                        Certificate = policy.PolicyCollectionFile.Certificate,
-                        Invoice = policy.PolicyCollectionFile.Invoice,
-                        InfoDate = policy.PolicyCollectionFile.InfoDate,
-                        EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                    },
-                    leasing = new LeasingData
-                    {
-                        ValidationDate = policy.ValidationDate,
-                        PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                        Bank = policy.PolicyInformationService.Bank,
-                        AccountNumber = policy.AccountNumber,
-                        IssueDate = policy.PolicyInformationService.IssueDate,
-                        DepositAmount = policy.DepositAmount,
-                    },
-                    validated = policy.Validated,
-                    comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                    {
-                        Comment = policyComment.Comment,
-                        User = policyComment.UserName,
-                        CommentDate = policyComment.CommentDate
-                    }).ToList()
-                }).Where(billingData => billingData.validated == validation & billingData.policy == policy
+                return billingData.Where(billingData => billingData.validated == validation & billingData.policy == policy
                 & billingData.leasing.IssueDate >= startDate
-                & billingData.leasing.IssueDate <= endDate).ToListAsync();
+                & billingData.leasing.IssueDate <= endDate);
             }
 
             //With date and policy number
             if ((startDate != null) && (endDate != null) && (policy != null))
             {
-                return await context.PoliciesCollection
-                .Include(policy => policy.Comments)
-                .Include(policy => policy.PolicyCollectionFile)
-                .Include(policy => policy.PolicyInformationService)
-                .Select(policy => new BillingData
-                {
-                    policy = policy.PolicyCollectionFile.Policy,
-                    clipert = new ClipertData
-                    {
-                        TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                        Reference = policy.PolicyCollectionFile.Reference,
-                        Certificate = policy.PolicyCollectionFile.Certificate,
-                        Invoice = policy.PolicyCollectionFile.Invoice,
-                        InfoDate = policy.PolicyCollectionFile.InfoDate,
-                        EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                    },
-                    leasing = new LeasingData
-                    {
-                        ValidationDate = policy.ValidationDate,
-                        PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                        Bank = policy.PolicyInformationService.Bank,
-                        AccountNumber = policy.AccountNumber,
-                        IssueDate = policy.PolicyInformationService.IssueDate,
-                        DepositAmount = policy.DepositAmount,
-                    },
-                    validated = policy.Validated,
-                    comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                    {
-                        Comment = policyComment.Comment,
-                        User = policyComment.UserName,
-                        CommentDate = policyComment.CommentDate
-                    }).ToList()
-                }).Where(billingData => billingData.policy == policy
-                && billingData.leasing.IssueDate >= startDate
-                && billingData.leasing.IssueDate <= endDate).ToListAsync();
+                return billingData.Where(billingData => billingData.policy == policy
+                 && billingData.leasing.IssueDate >= startDate
+                 && billingData.leasing.IssueDate <= endDate);
             }
 
             //policy and validation
             if ((validation != null) && (policy != null))
             {
-                return await context.PoliciesCollection
-                .Include(policy => policy.Comments)
-                .Include(policy => policy.PolicyCollectionFile)
-                .Include(policy => policy.PolicyInformationService)
-                .Select(policy => new BillingData
-                {
-                    policy = policy.PolicyCollectionFile.Policy,
-                    clipert = new ClipertData
-                    {
-                        TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                        Reference = policy.PolicyCollectionFile.Reference,
-                        Certificate = policy.PolicyCollectionFile.Certificate,
-                        Invoice = policy.PolicyCollectionFile.Invoice,
-                        InfoDate = policy.PolicyCollectionFile.InfoDate,
-                        EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                    },
-                    leasing = new LeasingData
-                    {
-                        ValidationDate = policy.ValidationDate,
-                        PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                        Bank = policy.PolicyInformationService.Bank,
-                        AccountNumber = policy.AccountNumber,
-                        IssueDate = policy.PolicyInformationService.IssueDate,
-                        DepositAmount = policy.DepositAmount,
-                    },
-                    validated = policy.Validated,
-                    comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                    {
-                        Comment = policyComment.Comment,
-                        User = policyComment.UserName,
-                        CommentDate = policyComment.CommentDate
-                    }).ToList()
-                }).Where(billingData => billingData.validated == validation & billingData.policy == policy).ToListAsync();
+                return billingData.Where(billingData => billingData.validated == validation & billingData.policy == policy);
 
             }
 
             //Date
             if ((startDate != null) && (endDate != null))
             {
-                return await context.PoliciesCollection
-                .Include(policy => policy.Comments)
-                .Include(policy => policy.PolicyCollectionFile)
-                .Include(policy => policy.PolicyInformationService)
-                .Select(policy => new BillingData
-                {
-                    policy = policy.PolicyCollectionFile.Policy,
-                    clipert = new ClipertData
-                    {
-                        TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                        Reference = policy.PolicyCollectionFile.Reference,
-                        Certificate = policy.PolicyCollectionFile.Certificate,
-                        Invoice = policy.PolicyCollectionFile.Invoice,
-                        InfoDate = policy.PolicyCollectionFile.InfoDate,
-                        EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                    },
-                    leasing = new LeasingData
-                    {
-                        ValidationDate = policy.ValidationDate,
-                        PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                        Bank = policy.PolicyInformationService.Bank,
-                        AccountNumber = policy.AccountNumber,
-                        IssueDate = policy.PolicyInformationService.IssueDate,
-                        DepositAmount = policy.DepositAmount,
-                    },
-                    validated = policy.Validated,
-                    comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                    {
-                        Comment = policyComment.Comment,
-                        User = policyComment.UserName,
-                        CommentDate = policyComment.CommentDate
-                    }).ToList()
-                }).Where(billingData => billingData.leasing.IssueDate >= startDate
-                && billingData.leasing.IssueDate <= endDate).ToListAsync();
+                return billingData.Where(billingData => billingData.leasing.IssueDate >= startDate
+                && billingData.leasing.IssueDate <= endDate);
             }
 
             //policy number
             if (policy != null)
             {
-                return await context.PoliciesCollection
-                .Include(policy => policy.Comments)
-                .Include(policy => policy.PolicyCollectionFile)
-                .Include(policy => policy.PolicyInformationService)
-                .Select(policy => new BillingData
-                {
-                    policy = policy.PolicyCollectionFile.Policy,
-                    clipert = new ClipertData
-                    {
-                        TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                        Reference = policy.PolicyCollectionFile.Reference,
-                        Certificate = policy.PolicyCollectionFile.Certificate,
-                        Invoice = policy.PolicyCollectionFile.Invoice,
-                        InfoDate = policy.PolicyCollectionFile.InfoDate,
-                        EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                    },
-                    leasing = new LeasingData
-                    {
-                        ValidationDate = policy.ValidationDate,
-                        PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                        Bank = policy.PolicyInformationService.Bank,
-                        AccountNumber = policy.AccountNumber,
-                        IssueDate = policy.PolicyInformationService.IssueDate,
-                        DepositAmount = policy.DepositAmount,
-                    },
-                    validated = policy.Validated,
-                    comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                    {
-                        Comment = policyComment.Comment,
-                        User = policyComment.UserName,
-                        CommentDate = policyComment.CommentDate
-                    }).ToList()
-                }).Where(billingData => billingData.policy == policy).ToListAsync();
+                return billingData.Where(billingData => billingData.policy == policy);
             }
 
             //validation status
             if (validation != null)
             {
-                return await context.PoliciesCollection
-              .Include(policy => policy.Comments)
-              .Include(policy => policy.PolicyCollectionFile)
-              .Include(policy => policy.PolicyInformationService)
-              .Select(policy => new BillingData
-              {
-                  policy = policy.PolicyCollectionFile.Policy,
-                  clipert = new ClipertData
-                  {
-                      TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                      Reference = policy.PolicyCollectionFile.Reference,
-                      Certificate = policy.PolicyCollectionFile.Certificate,
-                      Invoice = policy.PolicyCollectionFile.Invoice,
-                      InfoDate = policy.PolicyCollectionFile.InfoDate,
-                      EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-                  },
-                  leasing = new LeasingData
-                  {
-                      ValidationDate = policy.ValidationDate,
-                      PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                      Bank = policy.PolicyInformationService.Bank,
-                      AccountNumber = policy.AccountNumber,
-                      IssueDate = policy.PolicyInformationService.IssueDate,
-                      DepositAmount = policy.DepositAmount,
-                  },
-                  validated = policy.Validated,
-                  comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-                  {
-                      Comment = policyComment.Comment,
-                      User = policyComment.UserName,
-                      CommentDate = policyComment.CommentDate
-                  }).ToList()
-              }).Where(billingData => billingData.validated == validation).ToListAsync();
+                return billingData.Where(billingData => billingData.validated == validation);
 
             }
 
             //no params
 
-            return await context.PoliciesCollection
-          .Include(policy => policy.Comments)
-          .Include(policy => policy.PolicyCollectionFile)
-          .Include(policy => policy.PolicyInformationService)
-          .Select(policy => new BillingData
-          {
-              policy = policy.PolicyCollectionFile.Policy,
-              clipert = new ClipertData
-              {
-                  TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                  Reference = policy.PolicyCollectionFile.Reference,
-                  Certificate = policy.PolicyCollectionFile.Certificate,
-                  Invoice = policy.PolicyCollectionFile.Invoice,
-                  InfoDate = policy.PolicyCollectionFile.InfoDate,
-                  EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
-              },
-              leasing = new LeasingData
-              {
-                  ValidationDate = policy.ValidationDate,
-                  PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                  Bank = policy.PolicyInformationService.Bank,
-                  AccountNumber = policy.AccountNumber,
-                  IssueDate = policy.PolicyInformationService.IssueDate,
-                  DepositAmount = policy.DepositAmount,
-              },
-              validated = policy.Validated,
-              comments = policy.Comments.Select(policyComment => new PolicyCommentVM
-              {
-                  Comment = policyComment.Comment,
-                  User = policyComment.UserName,
-                  CommentDate = policyComment.CommentDate
-              }).ToList()
-          }).ToListAsync();
-
-
+            return billingData;
         }
 
+        public Task PatchPoliciesAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

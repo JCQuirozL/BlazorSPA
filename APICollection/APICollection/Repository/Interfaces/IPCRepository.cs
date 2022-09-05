@@ -12,9 +12,11 @@
         /// <returns></returns>
         /// 
 
-        //With date, policy number and validation status
-        public Task <List<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation);
+        public Task <IEnumerable<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation);
 
+        public Task<List<BillingData>> GatheringBillingData();
 
+        public Task PatchPoliciesAsync();
     }
 }
+ 

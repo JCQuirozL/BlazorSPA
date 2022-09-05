@@ -34,6 +34,7 @@ namespace APICollection.Entities
 
         public bool Validated { get; set; } = false;
 
+        [InverseProperty("PolicyCollectionId")]
         public List<PolicyComment> Comments { get; set; } = null!;
     }
 }

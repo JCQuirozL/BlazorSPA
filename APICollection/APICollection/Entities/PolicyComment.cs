@@ -9,9 +9,8 @@ namespace APICollection.Entities
         [Required]
         public int CommentId { get; set; }
 
-        //[ForeignKey("PolicyCollection")]
-        //public int PolicyColId { get; set; }
-        //public PolicyCollection PolicyCollection { get; set; } = null!;
+        
+        public PolicyCollection PolicyCollectionId { get; set; } = null!;
 
 
         [Column(TypeName = "varchar(10)")]
