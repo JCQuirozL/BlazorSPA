@@ -4,8 +4,7 @@ namespace APICollection.Entities
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using APICollection.Models;
-    public class PolicyCollection
+    public class PolicyCollection : Policies
 
     {
         [Key]
@@ -21,20 +20,8 @@ namespace APICollection.Entities
         public int PolicyInfoId { get; set; }
         public PolicyInformationService PolicyInformationService { get; set; } = null!;
 
-        public DateTime ValidationDate { get; set; }
-
-        [Required]
-        [Column(TypeName = "varchar(30)")]
-        public string AccountNumber { get; set; } = null!;
-
-        public DateTime DepositDate { get; set; }
-
-        [Column(TypeName = "decimal(14,2)")]
-        public decimal DepositAmount { get; set; }
-
-        public bool Validated { get; set; } = false;
-
-        [InverseProperty("PolicyCollectionId")]
+        
+        public List<PolicyCollectionHistory> PoliciesCollectionHistory { get; set; } = null!;
         public List<PolicyComment> Comments { get; set; } = null!;
     }
 }

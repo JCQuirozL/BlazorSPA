@@ -6,19 +6,17 @@ namespace APICollection.Entities
     public class PolicyComment
     {
         [Key]
-        [Required]
         public int CommentId { get; set; }
+        public int PolicyCollectionId { get; set; }
 
-        
-        public PolicyCollection PolicyCollectionId { get; set; } = null!;
-
-
-        [Column(TypeName = "varchar(10)")]
+        [Column(TypeName = "varchar(30)")]
         public String UserName { get; set; } = null!;
 
         [Column(TypeName = "varchar(30)")]
-        public String CommentType { get; set; }=null!;
-
+        public String CommentType { get; set; } = null!;
+        
+        
+        [Column(TypeName = "smalldatetime")]
         public DateTime CommentDate { get; set; }
 
         [Column(TypeName = "varchar(250)")]

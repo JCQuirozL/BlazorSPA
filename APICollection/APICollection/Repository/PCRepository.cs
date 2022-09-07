@@ -4,6 +4,7 @@ using APICollection.Entities;
 using Microsoft.EntityFrameworkCore;
 using APICollection.ViewModels;
 using APICollection.Responses;
+using APICollection.Requests;
 
 namespace APICollection.Repository
 {
@@ -16,31 +17,30 @@ namespace APICollection.Repository
         }
 
         public async Task<List<BillingData>> GatheringBillingData()
-        
+
             => await context.PoliciesCollection
                  .Include(policy => policy.Comments)
-                 .Include(policy => policy.PolicyCollectionFile)
-                 .Include(policy => policy.PolicyInformationService)
                  .Select(policy => new BillingData
                  {
-                     policy = policy.PolicyCollectionFile.Policy,
+                     policy = policy.Policy,
                      clipert = new ClipertData
                      {
-                         TotalPremium = policy.PolicyCollectionFile.TotalPremium,
-                         Reference = policy.PolicyCollectionFile.Reference,
-                         Certificate = policy.PolicyCollectionFile.Certificate,
-                         Invoice = policy.PolicyCollectionFile.Invoice,
-                         InfoDate = policy.PolicyCollectionFile.InfoDate,
-                         EmmiterCenter = policy.PolicyCollectionFile.EmitterCenter,
+                         TotalPremium = policy.TotalPremium,
+                         Reference = policy.Reference,
+                         Certificate = policy.Certificate,
+                         Invoice = policy.Invoice,
+                         SendingDateASE = policy.IssueDate,
+                         EmmiterCenter = policy.EmmiterCenter
                      },
                      leasing = new LeasingData
                      {
                          ValidationDate = policy.ValidationDate,
-                         PaymentFolio = policy.PolicyInformationService.PaymentFolio,
-                         Bank = policy.PolicyInformationService.Bank,
+                         PaymentFolio = policy.PaymentFolio,
+                         Bank = policy.Bank,
                          AccountNumber = policy.AccountNumber,
-                         IssueDate = policy.PolicyInformationService.IssueDate,
-                         DepositAmount = policy.DepositAmount,
+                         DocumentDate = policy.DepositDate,
+                         DepositAmount = policy.DepositAmount
+                         
                      },
                      validated = policy.Validated,
                      comments = policy.Comments.Select(policyComment => new PolicyCommentVM
@@ -74,16 +74,16 @@ namespace APICollection.Repository
             if ((startDate != null) && (endDate != null) && (policy != null) && (validation != null))
             {
                 return billingData.Where(billingData => billingData.validated == validation & billingData.policy == policy
-                & billingData.leasing.IssueDate >= startDate
-                & billingData.leasing.IssueDate <= endDate);
+                & billingData.clipert.SendingDateASE >= startDate
+                & billingData.clipert.SendingDateASE <= endDate);
             }
 
             //With date and policy number
             if ((startDate != null) && (endDate != null) && (policy != null))
             {
                 return billingData.Where(billingData => billingData.policy == policy
-                 && billingData.leasing.IssueDate >= startDate
-                 && billingData.leasing.IssueDate <= endDate);
+                 && billingData.clipert.SendingDateASE >= startDate
+                 && billingData.clipert.SendingDateASE <= endDate);
             }
 
             //policy and validation
@@ -96,8 +96,8 @@ namespace APICollection.Repository
             //Date
             if ((startDate != null) && (endDate != null))
             {
-                return billingData.Where(billingData => billingData.leasing.IssueDate >= startDate
-                && billingData.leasing.IssueDate <= endDate);
+                return billingData.Where(billingData => billingData.clipert.SendingDateASE >= startDate
+                && billingData.clipert.SendingDateASE <= endDate);
             }
 
             //policy number
@@ -118,9 +118,37 @@ namespace APICollection.Repository
             return billingData;
         }
 
-        public Task PatchPoliciesAsync()
+      
+        public async Task<Boolean> PatchPoliciesAsync(PatchPoliciesRequest[] request)
         {
-            throw new NotImplementedException();
+            PolicyCollection policy = new();
+            for (int i = 0; i < request.Length; i++)
+            {
+                var policyNumber = request[i].Policy.PolicyNumber;
+                policy = await context.PoliciesCollection
+                    .FirstOrDefaultAsync(p => p.Policy == policyNumber);
+
+                if (policy != null)
+                {
+                    policy.PaymentFolio = request[i].Policy.PaymentFolio;
+                    policy.Bank = request[i].Policy.Bank;
+                    policy.AccountNumber = request[i].Policy.AccountNumber;
+                    policy.DepositDate = request[i].Policy.DocumentDate;
+                    policy.DepositAmount = request[i].Policy.DepositAmount;
+                    policy.Validated = request[i].Policy.Validated;
+                    policy.UpdatedDate = DateTime.Now;
+                    //Si la póliza se marcó como validada, que se le inserte la fecha en que se está haciendo la validación
+                    if (policy.Validated)
+                    {
+                        policy.ValidationDate = DateTime.Now;
+                    }
+
+                    context.Update(policy);
+                }
+                
+            }
+
+            return await context.SaveChangesAsync() > 0;
         }
     }
 }

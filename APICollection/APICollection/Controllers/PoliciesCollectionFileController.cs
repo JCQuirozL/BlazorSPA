@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using APICollection.Data;
-using APICollection.Models;
 using APICollection.Repository.Interfaces;
+using APICollection.Entities;
 
 namespace APICollection.Controllers
 {

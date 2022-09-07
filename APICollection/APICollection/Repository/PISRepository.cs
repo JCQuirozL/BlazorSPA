@@ -1,7 +1,7 @@
 ﻿using APICollection.Repository.Interfaces;
 using APICollection.Data;
-using APICollection.Models;
 using Microsoft.EntityFrameworkCore;
+using APICollection.Entities;
 
 namespace APICollection.Repository
 {

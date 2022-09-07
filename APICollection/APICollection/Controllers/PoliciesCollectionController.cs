@@ -3,6 +3,7 @@
 namespace APICollection.Controllers
 {
     using APICollection.Repository.Interfaces;
+    using APICollection.Requests;
     using APICollection.Responses;
     using APICollection.ViewModels;
     using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,28 @@ namespace APICollection.Controllers
         {
             return await repository.GetPoliciesAsync(startDate, endDate, policy, validation);
 
+        }
+
+        [HttpPatch]
+        public async Task<ActionResult> UpdatePolicies([FromBody] PatchPoliciesRequest[] request)
+        {
+            Boolean policesWereUpdated = await repository.PatchPoliciesAsync(request);
+
+            if(request == null)
+            {
+                return NotFound(new ErrorResponse { Success = false, Message = "Requested resource not found." });
+            }
+
+            if (policesWereUpdated)
+            {
+                return Created("UpdatePolicies",new ServiceResult { Data = request, Annotations = "Succesfully validated data" });
+            }
+            else
+            {
+                return BadRequest(new ErrorResponse { Success = false, Message = "Incorrect sent data" });
+            }
+
+            
         }
 
 

@@ -1,4 +1,4 @@
-﻿using APICollection.Models;
+﻿using APICollection.Entities;
 
 namespace APICollection.Repository.Interfaces
 {

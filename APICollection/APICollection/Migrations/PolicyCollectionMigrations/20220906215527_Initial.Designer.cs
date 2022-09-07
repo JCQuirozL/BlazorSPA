@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220906215527_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,13 +45,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmount")
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("EmmiterCenter")
                         .IsRequired()
@@ -60,7 +62,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()
@@ -84,13 +86,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("ValidationDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("PolicyCollectionId");
 
@@ -118,14 +120,14 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(5)");
 
                     b.Property<DateTime>("InfoDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Invoice")
                         .IsRequired()
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Policy")
                         .IsRequired()
@@ -164,13 +166,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmount")
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("EmmiterCenter")
                         .IsRequired()
@@ -181,7 +183,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()
@@ -202,13 +204,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("ValidationDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("PolicyCollectionHistoryId");
 
@@ -230,7 +232,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(250)");
 
                     b.Property<DateTime>("CommentDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("CommentType")
                         .IsRequired()
@@ -270,10 +272,10 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("InfoDate")
-                        .HasColumnType("smalldatetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()

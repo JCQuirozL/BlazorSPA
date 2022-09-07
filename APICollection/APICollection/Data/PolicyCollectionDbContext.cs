@@ -1,5 +1,4 @@
 ﻿using APICollection.Entities;
-using APICollection.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICollection.Data
@@ -13,6 +12,7 @@ namespace APICollection.Data
 
         public DbSet<PolicyComment> PolicyComments { get; set; }
         public DbSet<PolicyCollection> PoliciesCollection { get; set; } = null!;
+        public DbSet<PolicyCollectionHistory> PoliciesCollectionHistory { get; set; }
         public DbSet<PolicyInformationService>? PolicyInformationService { get; set; }
         public DbSet<PolicyCollectionFile>? PolicyCollectionFile { get; set; }
 

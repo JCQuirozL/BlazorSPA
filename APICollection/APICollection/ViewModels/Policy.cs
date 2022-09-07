@@ -1,14 +1,20 @@
 ﻿namespace APICollection.ViewModels
 {
-    public class LeasingData
+    public class Policy
     {
-        public DateTime ValidationDate { get; set; }
+        public String PolicyNumber { get; set; }
+
         public String PaymentFolio { get; set; }
+
         public String Bank { get; set; }
+
         public String AccountNumber { get; set; }
+
         public DateTime DocumentDate { get; set; }
+
         public Decimal DepositAmount { get; set; }
 
+        public Boolean Validated { get; set; }
 
     }
 }

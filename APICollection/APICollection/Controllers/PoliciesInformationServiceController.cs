@@ -1,5 +1,5 @@
 ﻿using APICollection.Data;
-using APICollection.Models;
+using APICollection.Entities;
 using APICollection.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
