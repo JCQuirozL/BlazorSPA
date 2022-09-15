@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220914234051_FixFixInfoDateNotNull")]
+    partial class FixFixInfoDateNotNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,10 +298,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
             modelBuilder.Entity("APICollection.Entities.TimeLimitConfiguration", b =>
                 {
                     b.Property<byte>("ConfigId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("ConfigId"), 1L, 1);
 
                     b.Property<string>("Description")
                         .HasColumnType("varchar(50)");

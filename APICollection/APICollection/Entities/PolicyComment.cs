@@ -16,7 +16,7 @@ namespace APICollection.Entities
         public String CommentType { get; set; } = null!;
         
         
-        [Column(TypeName = "smalldatetime")]
+       
         public DateTime CommentDate { get; set; }
 
         [Column(TypeName = "varchar(250)")]

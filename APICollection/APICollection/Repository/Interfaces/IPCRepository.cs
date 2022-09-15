@@ -1,5 +1,6 @@
 ﻿namespace APICollection.Repository.Interfaces
 {
+    using APICollection.Entities;
     using APICollection.Requests;
     using APICollection.Responses;
     public interface IPCRepository
@@ -15,9 +16,13 @@
 
         public Task<IEnumerable<BillingData>> GetPoliciesAsync(DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation);
 
-        public Task<List<BillingData>> GatheringBillingData();
+        public Task<IEnumerable<BillingData>> GatheringBillingData();
 
         public Task<Boolean> PatchPoliciesAsync(PatchPoliciesRequest[] request);
+
+        public void AddPolicyCollectionHistory(PolicyCollection model);
+
+        //public Task PostCommentAsync(int id);
     }
 }
 

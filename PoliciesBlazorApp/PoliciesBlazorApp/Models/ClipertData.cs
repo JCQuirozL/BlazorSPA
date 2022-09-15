@@ -1,4 +1,4 @@
-﻿namespace APICollection.ViewModels
+﻿namespace PoliciesBlazorApp.Models
 {
     public class ClipertData
     {
@@ -7,6 +7,5 @@
         public String Invoice { get; set; }
         public DateTime SendingDateASE { get; set; }
         public String EmmiterCenter { get; set; }
-
     }
 }

@@ -16,6 +16,8 @@ namespace APICollection.Data
         public DbSet<PolicyInformationService>? PolicyInformationService { get; set; }
         public DbSet<PolicyCollectionFile>? PolicyCollectionFile { get; set; }
 
+        public DbSet<TimeLimitConfiguration> TimeLimitConfiguration { get; set; }
+
 
     }
 

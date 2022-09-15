@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220912170749_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,17 +44,14 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(15)");
 
-                    b.Property<byte>("ConfigId")
-                        .HasColumnType("tinyint");
-
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<decimal>("DepositAmount")
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("EmmiterCenter")
                         .IsRequired()
@@ -63,7 +62,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()
@@ -86,18 +85,16 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("smalldatetime");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("ValidationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.HasKey("PolicyCollectionId");
-
-                    b.HasIndex("ConfigId");
 
                     b.HasIndex("PolicyFileId");
 
@@ -122,15 +119,17 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(5)");
 
-                    b.Property<DateTime>("InfoDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("InfoDate")
+                        .IsRequired()
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("Invoice")
                         .IsRequired()
                         .HasColumnType("varchar(15)");
 
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("IssueDate")
+                        .IsRequired()
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("Policy")
                         .IsRequired()
@@ -165,13 +164,13 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<decimal>("DepositAmount")
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("EmmiterCenter")
                         .IsRequired()
@@ -182,7 +181,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()
@@ -202,14 +201,14 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("smalldatetime");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("ValidationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.HasKey("PolicyCollectionHistoryId");
 
@@ -231,7 +230,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(250)");
 
                     b.Property<DateTime>("CommentDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("CommentType")
                         .IsRequired()
@@ -271,10 +270,10 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("decimal(14,2)");
 
                     b.Property<DateTime>("DepositDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<DateTime>("InfoDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("smalldatetime");
 
                     b.Property<string>("PaymentFolio")
                         .IsRequired()
@@ -284,7 +283,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("ReferenceId")
+                    b.Property<string>("Reference")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
@@ -293,33 +292,8 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.ToTable("PolicyInformationService");
                 });
 
-            modelBuilder.Entity("APICollection.Entities.TimeLimitConfiguration", b =>
-                {
-                    b.Property<byte>("ConfigId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("ConfigId"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<byte>("TimeLimit")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("ConfigId");
-
-                    b.ToTable("TimeLimitConfiguration");
-                });
-
             modelBuilder.Entity("APICollection.Entities.PolicyCollection", b =>
                 {
-                    b.HasOne("APICollection.Entities.TimeLimitConfiguration", "Configuration")
-                        .WithMany()
-                        .HasForeignKey("ConfigId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("APICollection.Entities.PolicyCollectionFile", "PolicyCollectionFile")
                         .WithMany()
                         .HasForeignKey("PolicyFileId")
@@ -331,8 +305,6 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasForeignKey("PolicyInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Configuration");
 
                     b.Navigation("PolicyCollectionFile");
 

@@ -36,7 +36,6 @@ namespace APICollection.Controllers
         [ProducesResponseType(404, StatusCode = 404, Type = typeof(ErrorResponse))]
         [ProducesResponseType(401, StatusCode = 401, Type = typeof(ErrorResponse))]
         [ProducesResponseType(400, StatusCode = 400, Type = typeof(ErrorResponse))]
-        [ProducesResponseType(200, StatusCode = 204, Type = typeof(ServiceResult))]
         [ProducesResponseType(200, StatusCode = 200, Type = typeof(ServiceResult))]
 
         public async Task<IEnumerable<BillingData>> GetPoliciesCollection([FromQuery] DateTime? startDate, DateTime? endDate, String? policy, Boolean? validation)
@@ -46,25 +45,33 @@ namespace APICollection.Controllers
         }
 
         [HttpPatch]
+        [ProducesResponseType(201, StatusCode = 201, Type = typeof(ServiceResult))]
+        [ProducesResponseType(400, StatusCode = 400, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(401, StatusCode = 401, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(404, StatusCode = 404, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(500, StatusCode = 500, Type = typeof(ErrorResponse))]
         public async Task<ActionResult> UpdatePolicies([FromBody] PatchPoliciesRequest[] request)
         {
-            Boolean policesWereUpdated = await repository.PatchPoliciesAsync(request);
-
-            if(request == null)
+            try
             {
-                return NotFound(new ErrorResponse { Success = false, Message = "Requested resource not found." });
+                Boolean policesWereUpdated = await repository.PatchPoliciesAsync(request);
+
+                if (request == null)
+                    return BadRequest(new ErrorResponse { Success = false, Message = "Incorrect sent data" });
+
+                if (policesWereUpdated)
+                    return Created("UpdatePolicies", new ServiceResult { Data = request, Annotations = "Succesfully validated data." });
+                else
+                    return NotFound(new ErrorResponse { Success = false, Message = "Requested resource not found or changes have not been detected in current policy." });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ErrorResponse { Success = false, Message = "A problem has occurred during the operation." });
+
             }
 
-            if (policesWereUpdated)
-            {
-                return Created("UpdatePolicies",new ServiceResult { Data = request, Annotations = "Succesfully validated data" });
-            }
-            else
-            {
-                return BadRequest(new ErrorResponse { Success = false, Message = "Incorrect sent data" });
-            }
 
-            
+
         }
 
 

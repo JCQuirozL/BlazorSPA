@@ -1,7 +1,8 @@
-﻿using APICollection.ViewModels;
+﻿
 
-namespace APICollection.Responses
+namespace PoliciesBlazorApp.Responses
 {
+    using PoliciesBlazorApp.Models;
     public class BillingData
     {
         public String Policy { get; set; }

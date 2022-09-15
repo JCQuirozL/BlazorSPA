@@ -6,7 +6,7 @@ namespace APICollection.Entities
     public class PolicyCollectionFile
     {
         [Key]
-        public int PolicyFileId { get; set; }
+        public Int64 PolicyFileId { get; set; }
 
         [Required]
         [Column(TypeName = "varchar(50)")]
@@ -17,9 +17,6 @@ namespace APICollection.Entities
         [Column(TypeName = "decimal(14,2)")]
         public Decimal TotalPremium { get; set; }
 
-        [Required]
-        [Column(TypeName = "varchar(50)")]
-        public String Reference { get; set; } = null!;
 
         [Required]
         [Column(TypeName = "varchar(15)")]
@@ -29,8 +26,6 @@ namespace APICollection.Entities
         [Column(TypeName = "varchar(15)")]
         public String Invoice { get; set; } = null!;
 
-        [Required]
-        [Column(TypeName = "smalldatetime")]
         public DateTime IssueDate { get; set; }
 
         [Required]
@@ -39,8 +34,7 @@ namespace APICollection.Entities
 
 
         //FEcha auditoría
-        [Required]
-        [Column(TypeName = "smalldatetime")]
+
         public DateTime InfoDate { get; set; }
 
     }

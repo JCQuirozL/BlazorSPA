@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using PoliciesBlazorApp.Models
 @using System.Net.Http
+@using PoliciesBlazorApp.Responses
 
 @inject HttpClient Http
 
@@ -8,13 +9,36 @@
 
 <h3>Pólizas por cobrar</h3>
 
-<div class="table-responsive">
+<DataGrid TItem="BillingData" Data="@PoliciesList" Sortable="true" Editable="true" ShowPager="true" PageSize="3">
+    <DataGridColumn TItem="BillingData" Field="@nameof(BillingData.Policy)" Caption="Póliza" />
+    <DataGridColumn TItem="BillingData" Field="Clipert.TotalPremium" Caption="Prima Total"/>
+    <DataGridColumn TItem="BillingData" Field="Leasing.PaymentFolio" Caption="Folio Pago" Editable="true"/>
+    <DataGridColumn TItem="BillingData" Field="Leasing.Bank" Caption="Banco" Editable="true" />
+    <DataGridColumn TItem="BillingData" Field="Leasing.AccountNumber" Caption="No. Cuenta" Editable="true" />
+    <DataGridColumn TItem="BillingData" Field="Leasing.DocumentDate" Caption="Fecha Depósito" Editable="true" />
+    <DataGridColumn TItem="BillingData" Field="Leasing.DepositAmount" Caption="Importe Depositado" Editable="true" />
+    <DataGridColumn TItem="BillingData" Field="Leasing.ReferenceId" Caption="Referencia" Editable="true" />
+    <DataGridColumn TItem="BillingData" Field="Clipert.Certificate" Caption="No. Cert." />
+    <DataGridColumn TItem="BillingData" Field="Clipert.Invoice" Caption="No. Fact." />
+    <DataGridColumn TItem="BillingData" Field="Clipert.SendingDateASE" Caption="Fecha Emisión" />
+    <DataGridColumn TItem="BillingData" Field="Clipert.EmmiterCenter" Caption="Centro Emisor" />
+    <DataGridColumn TItem="BillingData" Field="@nameof(BillingData.Validated)" Caption="Validada" Editable="true"/>
+    <DataGridCommandColumn TItem="BillingData">
+        <NewCommandTemplate>
+            <TableRowHeader>Acciones</TableRowHeader>
+        </NewCommandTemplate>
+        <EditCommandTemplate>
+            <Button Color="Color.Primary" Clicked="@context.Clicked">Editar</Button>
+        </EditCommandTemplate>
+    </DataGridCommandColumn>
+
+</DataGrid>
+@*<div class="table-responsive">
     <table class="table table-res align-middle">
         <thead>
             <tr>
                 <th scope="col">Póliza</th>
                 <th scope="col">Prima Total</th>
-                <th scope="col">Fecha Validación</th>
                 <th scope="col"> Folio Pago</th>
                 <th scope="col">Banco</th>
                 <th scope="col">No. Cuenta</th>
@@ -34,21 +58,24 @@
             @foreach (var policy in PoliciesList)
             {
                 <tr>
-                    <td>@policy.policy</td>
-                    <td>@policy.totalPremium</td>
-                    <td>@policy.validationDate</td>
-                    <td><input style="width:6rem;" value="@policy.paymentFolio" /></td>
-                    <td><input style="width:6rem;" value="@policy.bank"></td>
-                    <td><input style="width:8rem;" value="@policy.accountNumber"> </td>
-                    <td><input type="date" value="@policy.issueDate.ToString("yyyy/MM/dd")"></td>
-                    <td><input style="width:6rem;" value="@policy.depositAmount" type="number"></td>
-                    <td>@policy.reference</td>
-                    <td>@policy.certificate</td>
-                    <td>@policy.invoice</td>
-                    <td>@policy.infoDate</td>
-                    <td>@policy.emmiterCenter</td>
+                    <td>@policy.Policy</td>
+                    <td>@policy.Clipert.TotalPremium</td>
+
+                    <TextEdit @bind-Text="@policy.Leasing.PaymentFolio" Size="Size.Small" />
+
+                    <td><input style="width:6rem;" value="@policy.Leasing.Bank"></td>
+                    <td><input style="width:8rem;" value="@policy.Leasing.AccountNumber"> </td>
+                    <td><input type="date" value="@policy.Clipert.SendingDateASE.ToString("yyyy/MM/dd")"></td>
+
+                    <NumericEdit Value="@policy.Leasing.DepositAmount" TValue="Decimal" Size="Size.Small" />
+
+                    <td>@policy.Leasing.ReferenceId</td>
+                    <td>@policy.Clipert.Certificate</td>
+                    <td>@policy.Clipert.Invoice</td>
+                    <td>@policy.Leasing.DocumentDate</td>
+                    <td>@policy.Clipert.EmmiterCenter</td>
                     <td width="20%"><div><Button Color="Color.Info">Ver</Button></div></td>
-                    <td><input type="checkbox" checked="@policy.validated"></td>
+                    <td><input type="checkbox" checked="@policy.Validated"></td>
                     <td width="25%">
                         <div><a class="btn btn-success">Validar</a></div>
                     </td>
@@ -56,7 +83,7 @@
             }
         </tbody>
     </table>
-</div>
+</div>*@
 @*Welcome to your new app.*@
 
 @*<SurveyPrompt Title="How is Blazor working for you?" />*@
@@ -64,7 +91,7 @@
 @code {
     public string Url = "/api/PoliciesCollection";
 
-    public List<PoliciesCollectionVM> PoliciesList = new();
+    public List<BillingData> PoliciesList = new();
 
     protected override async Task OnInitializedAsync() => await LoadPoliciesAsync();
 
@@ -72,7 +99,7 @@
     {
         try
         {
-            PoliciesList = await Http.GetFromJsonAsync<List<PoliciesCollectionVM>>(Url);
+            PoliciesList = await Http.GetFromJsonAsync<List<BillingData>>(Url);
         }
         catch (Exception)
         {

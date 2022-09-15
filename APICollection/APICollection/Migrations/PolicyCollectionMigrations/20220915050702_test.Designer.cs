@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220915050702_test")]
+    partial class test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +43,6 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<string>("Certificate")
                         .IsRequired()
                         .HasColumnType("varchar(15)");
-
-                    b.Property<byte>("ConfigId")
-                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -96,8 +95,6 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("PolicyCollectionId");
-
-                    b.HasIndex("ConfigId");
 
                     b.HasIndex("PolicyFileId");
 
@@ -293,33 +290,8 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.ToTable("PolicyInformationService");
                 });
 
-            modelBuilder.Entity("APICollection.Entities.TimeLimitConfiguration", b =>
-                {
-                    b.Property<byte>("ConfigId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("ConfigId"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<byte>("TimeLimit")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("ConfigId");
-
-                    b.ToTable("TimeLimitConfiguration");
-                });
-
             modelBuilder.Entity("APICollection.Entities.PolicyCollection", b =>
                 {
-                    b.HasOne("APICollection.Entities.TimeLimitConfiguration", "Configuration")
-                        .WithMany()
-                        .HasForeignKey("ConfigId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("APICollection.Entities.PolicyCollectionFile", "PolicyCollectionFile")
                         .WithMany()
                         .HasForeignKey("PolicyFileId")
@@ -331,8 +303,6 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasForeignKey("PolicyInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Configuration");
 
                     b.Navigation("PolicyCollectionFile");
 

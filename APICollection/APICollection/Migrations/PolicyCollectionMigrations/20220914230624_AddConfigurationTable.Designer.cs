@@ -4,6 +4,7 @@ using APICollection.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    partial class PolicyCollectionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220914230624_AddConfigurationTable")]
+    partial class AddConfigurationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,6 +45,9 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("varchar(15)");
 
                     b.Property<byte>("ConfigId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("ConfigurationConfigId")
                         .HasColumnType("tinyint");
 
                     b.Property<DateTime>("CreatedDate")
@@ -86,7 +91,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
@@ -97,7 +102,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
 
                     b.HasKey("PolicyCollectionId");
 
-                    b.HasIndex("ConfigId");
+                    b.HasIndex("ConfigurationConfigId");
 
                     b.HasIndex("PolicyFileId");
 
@@ -122,7 +127,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(5)");
 
-                    b.Property<DateTime>("InfoDate")
+                    b.Property<DateTime?>("InfoDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Invoice")
@@ -202,7 +207,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
@@ -296,27 +301,24 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
             modelBuilder.Entity("APICollection.Entities.TimeLimitConfiguration", b =>
                 {
                     b.Property<byte>("ConfigId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<byte>("ConfigId"), 1L, 1);
-
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte>("TimeLimit")
                         .HasColumnType("tinyint");
 
                     b.HasKey("ConfigId");
 
-                    b.ToTable("TimeLimitConfiguration");
+                    b.ToTable("Configuration");
                 });
 
             modelBuilder.Entity("APICollection.Entities.PolicyCollection", b =>
                 {
                     b.HasOne("APICollection.Entities.TimeLimitConfiguration", "Configuration")
                         .WithMany()
-                        .HasForeignKey("ConfigId")
+                        .HasForeignKey("ConfigurationConfigId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

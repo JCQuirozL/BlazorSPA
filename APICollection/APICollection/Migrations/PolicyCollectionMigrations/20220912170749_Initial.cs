@@ -13,16 +13,15 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                 name: "PolicyCollectionFile",
                 columns: table => new
                 {
-                    PolicyFileId = table.Column<int>(type: "int", nullable: false)
+                    PolicyFileId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Policy = table.Column<string>(type: "varchar(50)", nullable: false),
                     TotalPremium = table.Column<decimal>(type: "decimal(14,2)", nullable: false),
-                    Reference = table.Column<string>(type: "varchar(50)", nullable: false),
                     Certificate = table.Column<string>(type: "varchar(15)", nullable: false),
                     Invoice = table.Column<string>(type: "varchar(15)", nullable: false),
-                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
                     EmmiterCenter = table.Column<string>(type: "varchar(5)", nullable: false),
-                    InfoDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    InfoDate = table.Column<DateTime>(type: "smalldatetime", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,15 +32,16 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                 name: "PolicyInformationService",
                 columns: table => new
                 {
-                    PolicyInfoId = table.Column<int>(type: "int", nullable: false)
+                    PolicyInfoId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Policy = table.Column<string>(type: "varchar(50)", nullable: false),
                     PaymentFolio = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Reference = table.Column<string>(type: "varchar(50)", nullable: false),
                     Bank = table.Column<string>(type: "varchar(200)", nullable: false),
                     AccountNumber = table.Column<string>(type: "varchar(50)", nullable: false),
-                    DepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepositDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
                     DepositAmount = table.Column<decimal>(type: "decimal(14,2)", nullable: false),
-                    InfoDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    InfoDate = table.Column<DateTime>(type: "smalldatetime", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,24 +54,24 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                 {
                     PolicyCollectionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PolicyFileId = table.Column<int>(type: "int", nullable: false),
-                    PolicyInfoId = table.Column<int>(type: "int", nullable: false),
+                    PolicyFileId = table.Column<long>(type: "bigint", nullable: false),
+                    PolicyInfoId = table.Column<long>(type: "bigint", nullable: false),
                     Policy = table.Column<string>(type: "varchar(50)", nullable: false),
                     TotalPremium = table.Column<decimal>(type: "decimal(14,2)", nullable: false),
                     PaymentFolio = table.Column<string>(type: "varchar(50)", nullable: false),
                     Bank = table.Column<string>(type: "varchar(200)", nullable: false),
                     AccountNumber = table.Column<string>(type: "varchar(50)", nullable: false),
                     DepositAmount = table.Column<decimal>(type: "decimal(14,2)", nullable: false),
-                    DepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Reference = table.Column<string>(type: "varchar(50)", nullable: false),
+                    DepositDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
+                    ReferenceId = table.Column<string>(type: "varchar(50)", nullable: false),
                     Certificate = table.Column<string>(type: "varchar(15)", nullable: false),
                     Invoice = table.Column<string>(type: "varchar(15)", nullable: false),
-                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
                     EmmiterCenter = table.Column<string>(type: "varchar(5)", nullable: false),
                     Validated = table.Column<bool>(type: "bit", nullable: false),
-                    ValidationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ValidationDate = table.Column<DateTime>(type: "smalldatetime", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "smalldatetime", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,16 +103,16 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     Bank = table.Column<string>(type: "varchar(200)", nullable: false),
                     AccountNumber = table.Column<string>(type: "varchar(50)", nullable: false),
                     DepositAmount = table.Column<decimal>(type: "decimal(14,2)", nullable: false),
-                    DepositDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Reference = table.Column<string>(type: "varchar(50)", nullable: false),
+                    DepositDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
+                    ReferenceId = table.Column<string>(type: "varchar(50)", nullable: false),
                     Certificate = table.Column<string>(type: "varchar(15)", nullable: false),
                     Invoice = table.Column<string>(type: "varchar(15)", nullable: false),
-                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
                     EmmiterCenter = table.Column<string>(type: "varchar(5)", nullable: false),
                     Validated = table.Column<bool>(type: "bit", nullable: false),
-                    ValidationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ValidationDate = table.Column<DateTime>(type: "smalldatetime", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "smalldatetime", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,7 +134,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     PolicyCollectionId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "varchar(30)", nullable: false),
                     CommentType = table.Column<string>(type: "varchar(30)", nullable: false),
-                    CommentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CommentDate = table.Column<DateTime>(type: "smalldatetime", nullable: false),
                     Comment = table.Column<string>(type: "varchar(250)", nullable: false)
                 },
                 constraints: table =>

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APICollection.Migrations.PolicyCollectionMigrations
 {
     [DbContext(typeof(PolicyCollectionDbContext))]
-    [Migration("20220906215527_Initial")]
-    partial class Initial
+    [Migration("20220914232742_FixNvarcharToVarchar")]
+    partial class FixNvarcharToVarchar
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,6 +44,9 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(15)");
 
+                    b.Property<byte>("ConfigId")
+                        .HasColumnType("tinyint");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -72,29 +75,31 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("PolicyFileId")
-                        .HasColumnType("int");
+                    b.Property<long>("PolicyFileId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("PolicyInfoId")
-                        .HasColumnType("int");
+                    b.Property<long>("PolicyInfoId")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Reference")
+                    b.Property<string>("ReferenceId")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ValidationDate")
+                    b.Property<DateTime?>("ValidationDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("PolicyCollectionId");
+
+                    b.HasIndex("ConfigId");
 
                     b.HasIndex("PolicyFileId");
 
@@ -105,11 +110,11 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
 
             modelBuilder.Entity("APICollection.Entities.PolicyCollectionFile", b =>
                 {
-                    b.Property<int>("PolicyFileId")
+                    b.Property<long>("PolicyFileId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PolicyFileId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PolicyFileId"), 1L, 1);
 
                     b.Property<string>("Certificate")
                         .IsRequired()
@@ -119,7 +124,7 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(5)");
 
-                    b.Property<DateTime>("InfoDate")
+                    b.Property<DateTime?>("InfoDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Invoice")
@@ -130,10 +135,6 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Policy")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Reference")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
@@ -196,20 +197,20 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                     b.Property<int>("PolicyCollectionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Reference")
+                    b.Property<string>("ReferenceId")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<decimal>("TotalPremium")
                         .HasColumnType("decimal(14,2)");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Validated")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ValidationDate")
+                    b.Property<DateTime?>("ValidationDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("PolicyCollectionHistoryId");
@@ -254,11 +255,11 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
 
             modelBuilder.Entity("APICollection.Entities.PolicyInformationService", b =>
                 {
-                    b.Property<int>("PolicyInfoId")
+                    b.Property<long>("PolicyInfoId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PolicyInfoId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PolicyInfoId"), 1L, 1);
 
                     b.Property<string>("AccountNumber")
                         .IsRequired()
@@ -285,13 +286,39 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("ReferenceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
                     b.HasKey("PolicyInfoId");
 
                     b.ToTable("PolicyInformationService");
                 });
 
+            modelBuilder.Entity("APICollection.Entities.TimeLimitConfiguration", b =>
+                {
+                    b.Property<byte>("ConfigId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<byte>("TimeLimit")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("ConfigId");
+
+                    b.ToTable("TimeLimitConfiguration");
+                });
+
             modelBuilder.Entity("APICollection.Entities.PolicyCollection", b =>
                 {
+                    b.HasOne("APICollection.Entities.TimeLimitConfiguration", "Configuration")
+                        .WithMany()
+                        .HasForeignKey("ConfigId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("APICollection.Entities.PolicyCollectionFile", "PolicyCollectionFile")
                         .WithMany()
                         .HasForeignKey("PolicyFileId")
@@ -303,6 +330,8 @@ namespace APICollection.Migrations.PolicyCollectionMigrations
                         .HasForeignKey("PolicyInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Configuration");
 
                     b.Navigation("PolicyCollectionFile");
 

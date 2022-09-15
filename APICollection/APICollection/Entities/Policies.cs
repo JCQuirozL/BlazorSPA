@@ -28,12 +28,11 @@ namespace APICollection.Entities
         [Column(TypeName = "decimal(14,2)")]
         public Decimal DepositAmount { get; set; }
 
-        [Column(TypeName = "smalldatetime")]
         public DateTime DepositDate { get; set; }
 
         [Required]
         [Column(TypeName = "varchar(50)")]
-        public String Reference { get; set; } = null!;
+        public String ReferenceId { get; set; } = null!;
 
         [Required]
         [Column(TypeName = "varchar(15)")]
@@ -44,8 +43,6 @@ namespace APICollection.Entities
         [Column(TypeName = "varchar(15)")]
         public String Invoice { get; set; } = null!;
 
-        [Required]
-        [Column(TypeName = "smalldatetime")]
         public DateTime IssueDate { get; set; }
 
         [Required]
@@ -54,14 +51,14 @@ namespace APICollection.Entities
 
         public Boolean Validated { get; set; } = false;
 
-        [Column(TypeName = "smalldatetime")]
-        public DateTime ValidationDate { get; set; }
 
-        [Column(TypeName = "smalldatetime")]
+        public DateTime? ValidationDate { get; set; }
+
+       
         public DateTime CreatedDate { get; set; }
 
-        [Column(TypeName = "smalldatetime")]
-        public DateTime UpdatedDate { get; set; }
+        
+        public DateTime? UpdatedDate { get; set; }
 
 
     }
