@@ -3,12 +3,14 @@
 @using System.Net.Http
 @using PoliciesBlazorApp.Responses
 @using System.Net.Http.Headers
+@using System.Linq
+@using System.Text
 
 @inject HttpClient Http
 
 <PageTitle>Pólizas</PageTitle>
 
-<h3>Pólizas por cobrar</h3>
+<h5>Pólizas por cobrar</h5>
 
 @*<DataGrid TItem="Data" Data="@PoliciesList.Data" Sortable="true" Editable="true" ShowPager="true" PageSize="3" Hoverable="true" Responsive
           EditMode="DataGridEditMode.Popup" FixedHeader="true" Resizable ResizeMode="TableResizeMode.Header">
@@ -49,8 +51,44 @@
 
 </DataGrid>*@
 
-<DataGrid TItem="Data" Data="@PoliciesList.Data" @bind-SelectedRow="@selectedItem" Editable ShowPager Responsive="true"
-          EditMode="DataGridEditMode.Popup" PopupTitleTemplate="@Title" FixedHeader="true" Resizable Hoverable CommandMode="DataGridCommandMode.ButtonRow">
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            Póliza: <TextEdit @bind-Text="@policyFilter"></TextEdit>
+        </div>
+        <div class="col-3">
+            Fecha inicio: <DatePicker @bind-Date="@startDateFilter"></DatePicker>
+        </div>
+        <div class="col-3">
+            Fecha fin: <DatePicker @bind-Date="@endDateFilter"></DatePicker>
+        </div>
+        <div class="col-3">
+            Validada:
+            <Select TValue="bool?" @bind-SelectedValue="@validatedFilter">
+                <SelectItem TValue="bool?" Value="true">Sí</SelectItem>
+                <SelectItem TValue="bool?" Value="false">No</SelectItem>
+                <SelectItem TValue="bool?" Value="(bool?)null">Todas</SelectItem>
+            </Select>
+
+        </div>
+    </div>
+</div>
+
+<DataGrid TItem="Data"
+          Data="@PoliciesList.Data"
+          @bind-SelectedRow="@selectedItem"
+          Editable
+          ShowPager
+          Responsive="true"
+          EditMode="DataGridEditMode.Popup"
+          PopupTitleTemplate="@Title"
+          FixedHeader="true"
+          Resizable
+          Hoverable
+          CommandMode="DataGridCommandMode.ButtonRow"
+          CustomFilter="@OnCustomFilter"
+          RowUpdated="@OnRowUpdated"
+          UseInternalEditing=true>
     <ButtonRowTemplate>
         <Button Color="Color.Primary" Disabled="(selectedItem is null)" Clicked="context.EditCommand.Clicked">Editar</Button>
         <Button Color="Color.Secondary" Disabled="(selectedItem is null)" Clicked="@ShowDetailsModal">Detalle</Button>
@@ -58,7 +96,10 @@
     <DataGridColumns>
         <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
             <SaveCommandTemplate>
-                <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">Guardar</Button>
+                <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
+                        Clicked="@context.Clicked">
+                    Guardar
+                </Button>
             </SaveCommandTemplate>
             <CancelCommandTemplate>
                 <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
@@ -72,7 +113,7 @@
         <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="No. Cuenta" Editable="true" />
         <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="Fecha Depósito" Editable="true" />
         <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="Importe Depositado" Editable="true" DisplayFormat="{0:C}"
-                        DisplayFormatProvider="@System.Globalization.CultureInfo.InvariantCulture" />
+                        DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
         <DataGridColumn TItem="Data" Field="Leasing.ReferenceId" Caption="Referencia" Editable="true" />
         <DataGridColumn TItem="Data" Field="Clipert.Certificate" Caption="No. Cert." Displayable="false" />
         <DataGridColumn TItem="Data" Field="Clipert.Invoice" Caption="No. Fact." />
@@ -126,41 +167,53 @@
 <Modal @ref="detailsModalRef">
     <ModalContent Size="ModalSize.Large">
         <ModalHeader>
-            <ModalTitle>Detalle de la póliza @selectedItem.Policy</ModalTitle>
+            <ModalTitle Style="text-align:center">Detalle de la póliza @selectedItem.Policy</ModalTitle>
             <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Prima Total</FieldLabel>
-                <Text>@selectedItem.Clipert.TotalPremium</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Prima Total: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.TotalPremium</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Folio de pago: </FieldLabel>
-                <Text>@selectedItem.Leasing.PaymentFolio</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Folio de pago: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.PaymentFolio</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Banco: </FieldLabel>
-                <Text>@selectedItem.Leasing.Bank</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Banco: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.Bank</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Número de cuenta: </FieldLabel>
-                <Text>@selectedItem.Leasing.AccountNumber</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Número de cuenta: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.AccountNumber</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Fecha de depósito: </FieldLabel>
-                <Text>@selectedItem.Leasing.DocumentDate</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de depósito: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DocumentDate</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Importe depositado: </FieldLabel>
-                <Text>@selectedItem.Leasing.DepositAmount</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Importe depositado: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DepositAmount</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Referencia: </FieldLabel>
-                <Text>@selectedItem.Leasing.ReferenceId</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Referencia: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.ReferenceId</Text>
             </Field>
-            <Field>
-                <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                <Text>@selectedItem.Clipert.Certificate</Text>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Certificate</Text>
+            </Field>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Invoice</Text>
+            </Field>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.SendingDateASE</Text>
+            </Field>
+            <Field Padding="Padding.Is2">
+                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.EmmiterCenter</Text>
             </Field>
         </ModalBody>
     </ModalContent>
@@ -176,12 +229,115 @@
     public string Url = "/insurance/v1/policies";
     public string Url2 = "/api/PoliciesCollection";
 
-    public List<PolicyCommentVM> Comments = new();
     public BillingData PoliciesList = new();
     private Modal commentsModalRef = new();
     private Modal detailsModalRef = new();
 
+    private string? policyFilter;
+    private DateTime? startDateFilter = null;
+    private DateTime? endDateFilter = null;
+    private bool? validatedFilter = null;
+
+
+    private bool OnCustomFilter(Data model)
+    {
+        // We want to accept empty value as valid or otherwise
+        // datagrid will not show anything.
+        //if ((string.IsNullOrEmpty(policyFilter)) || (startDateFilter == null) || (endDateFilter == null) || (validatedFilter.Equals(null)))
+        //return true;
+
+        //All params
+        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter != null))
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
+        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) &&
+        (model.Validated.Equals(validatedFilter)) == true;
+        }
+
+        //With emission date and Policy number
+        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null))
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
+        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) == true;
+        }
+
+        //Policy and validation
+        if (validatedFilter != null && policyFilter != null)
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
+            (model.Validated.Equals(validatedFilter)) == true;
+        }
+
+        //Date
+        if ((startDateFilter != null) && (endDateFilter != null))
+        {
+            return (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) == true;
+        }
+
+        //Policy number
+        if (policyFilter != null)
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        //validation status
+        if (validatedFilter != null)
+        {
+            return model.Validated.Equals(validatedFilter) == true;
+        }
+
+        if (validatedFilter == null)
+        {
+            return true;
+        }
+
+        return true;
+
+
+    }
+
     protected override async Task OnInitializedAsync() => await LoadPoliciesAsync();
+
+    async Task OnRowUpdated(SavedRowItem<Data, Dictionary<string, object>> e)
+    {
+        var policies = e.Item;
+        Policy p = new()
+            {
+                PolicyNumber = policies.Policy,
+                PaymentFolio = policies.Leasing.PaymentFolio,
+                ReferenceId = policies.Leasing.ReferenceId,
+                Bank = policies.Leasing.Bank,
+                Invoice = policies.Clipert.Invoice,
+                AccountNumber = policies.Leasing.AccountNumber,
+                DocumentDate = policies.Leasing.DocumentDate,
+                DepositAmount = policies.Leasing.DepositAmount,
+                Validated = policies.Validated
+            };
+        try
+        {
+            PatchPolicies[] model = new[] { new PatchPolicies(p) };
+
+            var json = JsonConvert.SerializeObject(model);
+            var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Patch, Url);
+
+            request.Headers.Add("Session-Id", "10000057cpbas096");
+            request.Content = body;
+
+            using var httpResponse = await Http.SendAsync(request);
+
+            await LoadPoliciesAsync();
+
+            StateHasChanged();
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 
     async Task LoadPoliciesAsync()
     {
@@ -192,7 +348,8 @@
             request.Headers.Add("Session-Id", "10000057cpbas096");
             using var httpResponse = await Http.SendAsync(request);
 
-            PoliciesList = await httpResponse.Content.ReadFromJsonAsync<BillingData>();
+            PoliciesList = await httpResponse.Content.ReadFromJsonAsync<BillingData>
+    ();
             //PoliciesList = await Http.GetFromJsonAsync<List<BillingData>>(Url);
         }
         catch (Exception)
@@ -203,6 +360,41 @@
 
     }
 
+    //async Task PatchPoliciesAsync()
+    //{
+
+    //    try
+    //    {
+
+    //        PatchPolicies model = new();
+    //        model.Policy.PolicyNumber = selectedItem.Policy;
+    //        model.Policy.PaymentFolio = selectedItem.Leasing.PaymentFolio;
+    //        model.Policy.ReferenceId = selectedItem.Leasing.ReferenceId;
+    //        model.Policy.Bank = selectedItem.Leasing.Bank;
+    //        model.Policy.Invoice = selectedItem.Clipert.Invoice;
+    //        model.Policy.AccountNumber = selectedItem.Leasing.AccountNumber;
+    //        model.Policy.DocumentDate = selectedItem.Leasing.DocumentDate;
+    //        model.Policy.DepositAmount = selectedItem.Leasing.DepositAmount;
+    //        model.Policy.Validated = selectedItem.Validated;
+
+    //        var json = JsonConvert.SerializeObject(model);
+    //        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+    //        var request = new HttpRequestMessage(HttpMethod.Patch, Url);
+
+    //        request.Headers.Add("Session-Id", "10000057cpbas096");
+    //        request.Content = body;
+
+    //        using var httpResponse = await Http.SendAsync(request);
+
+
+    //    }
+    //    catch (Exception)
+    //    {
+
+    //        throw;
+    //    }
+    //}
 
     private Task ShowCommentsModal()
     {
