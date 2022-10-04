@@ -1,0 +1,140 @@
+﻿@font-face {
+    font-family: 'bentonsansbbva-bold';
+    src: url('typo/bentonsansbbva-bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'bentonsansbbva-book';
+    src: url('typo/bentonsansbbva-book.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'bentonsansbbva-medium';
+    src: url('typo/bentonsansbbva-medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'bentonsansbbva-light';
+    src: url('typo/bentonsansbbva-light.ttf') format('truetype');
+}
+
+body {
+    font-family: bentonsansbbva-light !important;
+}
+
+.btn-primary {
+    color: #fff !important;
+    background-color: #1b6ec2 !important;
+    border-color: #1861ac !important;
+}
+
+.btn-secondary {
+    background-color: #03dac6 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.btn-flat-secondary, .btn-flat-secondary:focus, .btn-flat-secondary:hover, .btn-outline-secondary, .btn-outline-secondary:focus, .btn-outline-secondary:hover {
+    color: #03dac6 !important;
+    font-weight: 600 !important;
+}
+
+
+.font-weight-bold {
+    font-weight: 600 !important;
+}
+
+.table tbody td, .table tbody th {
+    height: 3.25rem !important;
+    letter-spacing: .0178571429em !important;
+    line-height: 1.25rem !important;
+    font-family: bentonsansbbva-book !important;
+}
+
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    color: inherit;
+    font-family: 'bentonsansbbva-bold' !important;
+    margin-bottom: 0.5rem;
+}
+
+.btn-blueBBVA {
+    background-color: #072146 !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+
+    .btn-blueBBVA:hover, .btn-blueBBVA:focus, .btn-blueBBVA:active {
+        color: white !important;
+    }
+
+    .btn-blueBBVA:hover {
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)) !important;
+    }
+
+    .btn-blueBBVA:focus, .btn-blueBBVA.focus {
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)) !important;
+    }
+
+    .btn-blueBBVA.active {
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.32)) !important;
+        transition: background-image 15ms linear 0.2s;
+    }
+
+.btn-flat-blueBBVA, .btn-flat-blueBBVA:hover, .btn-flat-blueBBVA:focus,
+.btn-outline-blueBBVA,
+.btn-outline-blueBBVA:hover,
+.btn-outline-blueBBVA:focus,
+.modal .btn-blueBBVA,
+.modal .btn-blueBBVA:hover,
+.modal .btn-blueBBVA:focus {
+    /*color: #072146 !important;*/
+}
+
+    .btn-flat-blueBBVA:hover,
+    .btn-outline-blueBBVA:hover,
+    .modal .btn-blueBBVA:hover {
+        background-image: linear-gradient(to bottom, rgba(98, 0, 238, 0.04), rgba(98, 0, 238, 0.04)) !important;
+    }
+
+    .btn-flat-blueBBVA:focus,
+    .btn-outline-blueBBVA:focus,
+    .modal .btn-blueBBVA:focus {
+        background-image: linear-gradient(to bottom, rgba(98, 0, 238, 0.12), rgba(98, 0, 238, 0.12)) !important;
+    }
+
+    .btn-flat-blueBBVA:disabled, .btn-flat-blueBBVA.disabled,
+    .btn-outline-blueBBVA:disabled,
+    .btn-outline-blueBBVA.disabled,
+    .modal .btn-blueBBVA:disabled,
+    .modal .btn-blueBBVA.disabled {
+        color: white !important;
+    }
+
+.text-detailsColor {
+    color: #1973B8 !important;
+}
+
+
+.background {
+    height: 57.1px !important;
+    border-radius: 1px !important;
+    background-color: #F4F4F4 !important;
+    padding-left: 1rem;
+}
+
+@media (max-width: 600px) {
+    .background {
+        width: 100px;
+        padding-left: 1rem;
+    }
+}
+
+@media (max-width: 450px) {
+    .background {
+        width: 50px;
+        padding-left: 1rem;
+    }
+}
+

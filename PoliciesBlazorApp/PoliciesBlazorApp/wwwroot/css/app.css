@@ -1,6 +1,5 @@
-﻿.sidebar-color{
-    background-color:red;
-
+﻿.sidebar-color {
+    background-color: red;
 }
 
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
@@ -22,6 +21,8 @@ a, .btn-link {
     background-color: #1b6ec2;
     border-color: #1861ac;
 }
+
+
 
 .content {
     padding-top: 1.1rem;

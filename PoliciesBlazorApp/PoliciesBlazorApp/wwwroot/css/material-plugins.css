@@ -182,10 +182,10 @@
   border-color: rgba(0, 0, 0, 0.42);
 }
 
-.dataTables_length .custom-select:focus {
-  border-color: #6200ee;
-  box-shadow: none;
-}
+    .dataTables_length .custom-select:focus {
+        border-color: #1973B8;
+        box-shadow: none;
+    }
 
 .dataTables_length > label {
   -ms-flex-align: center;
@@ -2107,8 +2107,8 @@ select.is-invalid ~ .select2-container .select2-selection,
 }
 
 .select2-container--outlined.select2-container--open .select2-selection {
-  border-color: #6200ee;
-  box-shadow: inset 2px 2px 0 -1px #6200ee, inset -2px -2px 0 -1px #6200ee;
+    border-color: #1973B8;
+    box-shadow: inset 2px 2px 0 -1px #6200ee, inset -2px -2px 0 -1px #6200ee;
 }
 
 .select2-container--outlined.select2-container--open .select2-selection::before {
