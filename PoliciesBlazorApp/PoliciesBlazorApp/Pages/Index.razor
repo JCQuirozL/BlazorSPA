@@ -55,26 +55,38 @@
 @*search fields*@
 <div style="padding:.5rem;" class="container">
     <div class="row">
-        <div class="col-3">
-            <TextEdit Class="background" Placeholder="Número de póliza" Color="Colores.AzulBBVA" @bind-Text="@policyFilter"></TextEdit>
+        <div class="col-4">
+            <TextEdit Class="col-12 background" Placeholder="Número de póliza" Color="Colores.AzulBBVA" @bind-Text="@policyFilter"></TextEdit>
         </div>
-        <div class="col-3">
-            De: <DatePicker Placeholder="Fecha inicial" @bind-Date="@startDateFilter"></DatePicker>
+        <div class="col-4">
+            <div class="row">
+                <div class="col-6">
+                    <DatePicker Class="col-12 background" Placeholder="Fecha inicial" @bind-Date="@startDateFilter"></DatePicker>
+                </div>
+                @*</div>
+                <div class="col-3">*@
+                <div class="col-6">
+                    <DatePicker Class="col-12 background" Placeholder="Fecha final" @bind-Date="@endDateFilter"></DatePicker>
+                </div>
+                @*<div class="col-4">
+                <Label Class="col-12">
+                <Icon Name="IconName.CalendarCheck" />
+                </Label>
+                </div>*@
+            </div>
         </div>
-        <div class="col-3">
-            Hasta: <DatePicker Placeholder="Fecha final" @bind-Date="@endDateFilter"></DatePicker>
-        </div>
-        <div class="col-3">
-            Validada:
-            <Select TValue="bool?" @bind-SelectedValue="@validatedFilter">
-                <SelectItem TValue="bool?" Value="true">Sí</SelectItem>
-                <SelectItem TValue="bool?" Value="false">No</SelectItem>
+
+        <div class="col-4">
+            <Select Class="col-12 background" TValue="bool?" @bind-SelectedValue="@validatedFilter">
+                <SelectItem TValue="bool?" Value="true">Validada</SelectItem>
+                <SelectItem TValue="bool?" Value="false">No validada</SelectItem>
                 <SelectItem TValue="bool?" Value="(bool?)null">Todas</SelectItem>
             </Select>
 
         </div>
     </div>
 </div>
+
 
 @*Grid*@
 
@@ -266,10 +278,20 @@
         </ModalBody>
     </ModalContent>
 </Modal>
+
+<Snackbar @ref="successSnackBar" Color="SnackbarColor.Info">
+  <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
+    Has validado correctamente la póliza @selectedItem.Policy
+    <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
+  </SnackbarBody>
+</Snackbar>
+
+
 @code {
     [CascadingParameter]
     public LoadingIndicator loadingIndicator { get; set; }
 
+    Snackbar successSnackBar;
     public RenderFragment<PopupTitleContext<Data>> Title { get; set; }
 
     public Data selectedItem = new Data();
@@ -292,7 +314,7 @@
         style.Background = Background.Default;
     }
 
-     private void OnSelectedRowStyling(Data policy, DataGridRowStyling style)
+    private void OnSelectedRowStyling(Data policy, DataGridRowStyling style)
     {
         style.Color = Colores.Light;
     }
@@ -306,7 +328,7 @@
     {
         style.Color = Colores.Dark;
     }
-   
+
     private bool OnCustomFilter(Data model)
     {
         // We want to accept empty value as valid or otherwise
@@ -391,6 +413,8 @@
             await LoadPoliciesAsync();
 
             await loadingIndicator.Hide();
+            successSnackBar.Location = SnackbarLocation.End;
+            await successSnackBar.Show();
             StateHasChanged();
 
         }
@@ -424,6 +448,7 @@
             await LoadPoliciesAsync();
 
             await loadingIndicator.Hide();
+            await successSnackBar.Show();
             StateHasChanged();
 
         }
