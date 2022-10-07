@@ -95,6 +95,7 @@
           @bind-SelectedRow="@selectedItem"
           Editable
           ShowPager
+          PageSize=7
           Responsive="true"
           EditMode="DataGridEditMode.Popup"
           PopupTitleTemplate="@Title"
@@ -103,82 +104,85 @@
           Hoverable
           CommandMode="DataGridCommandMode.ButtonRow"
           CustomFilter="@OnCustomFilter"
-          RowUpdated="@OnRowUpdated"
+          RowUpdated="@OnPolicyRowUpdated"
           UseInternalEditing=true
           DetailRowTrigger="@((e)=>e.Item == selectedItem)"
           SelectedRowStyling="@OnSelectedRowStyling"
-          RowStyling="@OnRowStyling" Padding="Padding.Is4">
+          RowStyling="@OnRowStyling"
+          Padding="Padding.Is4">
     <ButtonRowTemplate>
         <Button Color="Colores.AzulBBVA" Disabled="(selectedItem.Validated)" Clicked="context.EditCommand.Clicked">Editar</Button>
         @*<Button Color="Color.Secondary" Disabled="(selectedItem is null)" Clicked="@ShowDetailsModal">Detalle</Button>*@
     </ButtonRowTemplate>
 
     <DataGridColumns>
+        <LoadingIndicator @ref=loadingIndicator>
+            <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
+                <SaveCommandTemplate>
 
-        <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
-            <SaveCommandTemplate>
+                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
+                            Clicked="@context.Clicked">
+                        Guardar
+                    </Button>
 
-                <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
-                        Clicked="@context.Clicked">
-                    Guardar
-                </Button>
+                </SaveCommandTemplate>
+                <CancelCommandTemplate>
+                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
+                </CancelCommandTemplate>
 
-            </SaveCommandTemplate>
-            <CancelCommandTemplate>
-                <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
-            </CancelCommandTemplate>
+            </DataGridCommandColumn>
 
-        </DataGridCommandColumn>
-
-        <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
-        <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C}"
-                        DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-        <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
-        <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
-        <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
-        <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
-        <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
-                        DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-        <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
-        <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
-        <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDACIÓN" Editable="true">
-            <DisplayTemplate>
-                <Check TValue="Boolean" Checked="context.Validated" CheckedChanged="@OnCheckedChange"
-                       Disabled="selectedItem.Validated" Background="Background.Secondary" />
-            </DisplayTemplate>
-        </DataGridCheckColumn>
-        <DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />
-        <DataGridColumn TItem="Data" Caption="COMENTARIOS">
-            <DisplayTemplate>
-                <Botones Outline="true" Color="Colores.Secondary" Width="Width.Auto" Clicked="@ShowCommentsModal">Ver</Botones>
-            </DisplayTemplate>
-        </DataGridColumn>
+            <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
+            <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C}"
+                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
+            <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
+            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
+            <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
+            <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
+            <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
+                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
+            <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
+            <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
+            <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDACIÓN" Editable="true">
+                <DisplayTemplate>
+                    <Check TValue="Boolean" Checked="context.Validated" CheckedChanged="@OnCheckedChange"
+                           Disabled="selectedItem.Validated" Background="Background.Secondary" />
+                </DisplayTemplate>
+            </DataGridCheckColumn>
+            <DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />
+            <DataGridColumn TItem="Data" Caption="COMENTARIOS">
+                <DisplayTemplate>
+                    <Botones Outline="true" Color="Colores.Secondary" Width="Width.Auto" Clicked="@ShowCommentsModal">Ver</Botones>
+                </DisplayTemplate>
+            </DataGridColumn>
+        </LoadingIndicator>
     </DataGridColumns>
+
     <DetailRowTemplate>
         <div class="container">
             <div class="row">
                 <div class="col-3">
-                    <Field Padding="Padding.Is2">
-                        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                        <Text Style="font-size:1rem;" TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Certificate</Text>
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Certificate</Text>
                     </Field>
                 </div>
                 <div class="col-3">
-                    <Field Padding="Padding.Is2">
-                        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Factura: </FieldLabel>
-                        <Text Style="font-size:1rem;" TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Invoice</Text>
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Invoice</Text>
                     </Field>
                 </div>
                 <div class="col-3">
-                    <Field Padding="Padding.Is2">
-                        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
-                        <Text Style="font-size:1rem;" TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.SendingDateASE</Text>
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
+                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.SendingDateASE</Text>
                     </Field>
                 </div>
                 <div class="col-3">
-                    <Field Padding="Padding.Is2">
-                        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
-                        <Text Style="font-size:1rem;" TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.EmmiterCenter</Text>
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.EmmiterCenter</Text>
                     </Field>
                 </div>
             </div>
@@ -194,9 +198,20 @@
             @*<CloseButton />*@
         </ModalHeader>
         <ModalBody>
-            <DataGrid TItem="PolicyCommentVM" Data="@selectedItem.Comments" ShowPager Responsive FixedHeader Hoverable Editable
-                      CommandMode="DataGridCommandMode.ButtonRow" EditMode="DataGridEditMode.Form" @bind-SelectedRow="@selectedComment"
-                      SelectedRowStyling="@OnSelectedRowStylingComments" RowStyling="@OnRowStylingComments">
+            <DataGrid TItem="PolicyCommentVM"
+                      Data="@selectedItem.Comments"
+                      ShowPager
+                      PageSize="8"
+                      Responsive
+                      FixedHeader
+                      Hoverable
+                      Editable
+                      CommandMode="DataGridCommandMode.ButtonRow"
+                      EditMode="DataGridEditMode.Form"
+                      @bind-SelectedRow="@selectedComment"
+                      SelectedRowStyling="@OnSelectedRowStylingComments"
+                      RowStyling="@OnRowStylingComments"
+                      RowInserted="@OnCommentRowInserted">
                 <DataGridColumns>
                     <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable />
                     <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" />
@@ -280,18 +295,26 @@
 </Modal>
 
 <Snackbar @ref="successSnackBar" Color="SnackbarColor.Info">
-  <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
-    Has validado correctamente la póliza @selectedItem.Policy
-    <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
-  </SnackbarBody>
+    <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
+        Has validado correctamente la póliza @selectedItem.Policy
+        <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
+    </SnackbarBody>
+</Snackbar>
+<Snackbar @ref="errorSnackBar" Color="SnackbarColor.Danger">
+    <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
+        Ha ocurrido un error validando la información de la póliza @selectedItem.Policy
+        <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
+    </SnackbarBody>
 </Snackbar>
 
 
+
 @code {
-    [CascadingParameter]
-    public LoadingIndicator loadingIndicator { get; set; }
+    
+    LoadingIndicator loadingIndicator { get; set; }
 
     Snackbar successSnackBar;
+    Snackbar errorSnackBar;
     public RenderFragment<PopupTitleContext<Data>> Title { get; set; }
 
     public Data selectedItem = new Data();
@@ -408,14 +431,24 @@
         {
 
             await loadingIndicator.Show();
-            await PatchPoliciesAsync(policy);
 
-            await LoadPoliciesAsync();
+            var policiesWereUpdated = await PatchPoliciesAsync(policy);
 
-            await loadingIndicator.Hide();
-            successSnackBar.Location = SnackbarLocation.End;
-            await successSnackBar.Show();
-            StateHasChanged();
+            if (policiesWereUpdated)
+            {
+                await LoadPoliciesAsync();
+
+                await loadingIndicator.Hide();
+                await successSnackBar.Show();
+                StateHasChanged();
+            }
+            else
+            {
+                await loadingIndicator.Hide();
+                errorSnackBar.Location = SnackbarLocation.End;
+                await errorSnackBar.Show();
+            }
+
 
         }
         catch (Exception ex)
@@ -424,7 +457,44 @@
             throw;
         }
     }
-    async Task OnRowUpdated(SavedRowItem<Data, Dictionary<string, object>> e)
+
+    async Task OnCommentRowInserted(SavedRowItem<PolicyCommentVM, Dictionary<String, Object>> e)
+    {
+        var comment = e.Item;
+
+        PolicyCommentPost commentPost = new()
+            {
+                Policy = selectedItem.Policy,
+                Invoice = selectedItem.Clipert.Invoice,
+                Comment = comment.Comment
+            };
+
+        try
+        {
+            await loadingIndicator.Show();
+            var commentWerePosted = await PostCommentAsync(commentPost);
+
+            if (commentWerePosted)
+            {
+                await loadingIndicator.Hide();
+                await LoadPoliciesAsync();
+                await CloseCommentsModal();
+                await successSnackBar.Show();
+                StateHasChanged();
+            }
+            else
+            {
+                await loadingIndicator.Hide();
+
+                await errorSnackBar.Show();
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    async Task OnPolicyRowUpdated(SavedRowItem<Data, Dictionary<String, object>> e)
     {
 
         var policies = e.Item;
@@ -443,13 +513,25 @@
         try
         {
             await loadingIndicator.Show();
-            await PatchPoliciesAsync(policy);
 
-            await LoadPoliciesAsync();
+            var policiesWereUpdated = await PatchPoliciesAsync(policy);
 
-            await loadingIndicator.Hide();
-            await successSnackBar.Show();
-            StateHasChanged();
+            if (policiesWereUpdated)
+            {
+                await LoadPoliciesAsync();
+
+                await loadingIndicator.Hide();
+                await successSnackBar.Show();
+                StateHasChanged();
+            }
+            else
+            {
+                await loadingIndicator.Hide();
+
+                await errorSnackBar.Show();
+            }
+
+
 
         }
         catch (Exception)
@@ -459,7 +541,7 @@
         }
     }
 
-    async Task PatchPoliciesAsync(Policy policy)
+    async Task<Boolean> PatchPoliciesAsync(Policy policy)
     {
         PatchPolicies[] model = new[] { new PatchPolicies(policy) };
 
@@ -472,6 +554,8 @@
         request.Content = body;
 
         using var httpResponse = await Http.SendAsync(request);
+
+        return httpResponse.IsSuccessStatusCode ? true : false;
     }
     async Task LoadPoliciesAsync()
     {
@@ -493,41 +577,18 @@
 
     }
 
-    //async Task PatchPoliciesAsync()
-    //{
+    async Task<Boolean> PostCommentAsync(PolicyCommentPost model)
+    {
+        var json = JsonConvert.SerializeObject(model);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
 
-    //    try
-    //    {
+        var request = new HttpRequestMessage(HttpMethod.Post, Url);
+        request.Headers.Add("Session-Id", "10000057cpbas096");
+        request.Content = body;
+        using var httpResponse = await Http.SendAsync(request);
 
-    //        PatchPolicies model = new();
-    //        model.Policy.PolicyNumber = selectedItem.Policy;
-    //        model.Policy.PaymentFolio = selectedItem.Leasing.PaymentFolio;
-    //        model.Policy.ReferenceId = selectedItem.Leasing.ReferenceId;
-    //        model.Policy.Bank = selectedItem.Leasing.Bank;
-    //        model.Policy.Invoice = selectedItem.Clipert.Invoice;
-    //        model.Policy.AccountNumber = selectedItem.Leasing.AccountNumber;
-    //        model.Policy.DocumentDate = selectedItem.Leasing.DocumentDate;
-    //        model.Policy.DepositAmount = selectedItem.Leasing.DepositAmount;
-    //        model.Policy.Validated = selectedItem.Validated;
-
-    //        var json = JsonConvert.SerializeObject(model);
-    //        var body = new StringContent(json, Encoding.UTF8, "application/json");
-
-    //        var request = new HttpRequestMessage(HttpMethod.Patch, Url);
-
-    //        request.Headers.Add("Session-Id", "10000057cpbas096");
-    //        request.Content = body;
-
-    //        using var httpResponse = await Http.SendAsync(request);
-
-
-    //    }
-    //    catch (Exception)
-    //    {
-
-    //        throw;
-    //    }
-    //}
+        return httpResponse.IsSuccessStatusCode ? true : false;
+    }
 
     private Task ShowCommentsModal()
     {
