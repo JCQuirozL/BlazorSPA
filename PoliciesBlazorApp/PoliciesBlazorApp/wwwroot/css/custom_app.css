@@ -59,7 +59,7 @@ body {
 }
 
 .btn-blueBBVA {
-    background-color: #072146 !important;
+    background-color: #043263 !important;
     color: white !important;
     font-weight: 600;
 }
@@ -118,22 +118,36 @@ body {
 
 
 .background {
-    height: 57.1px !important;
+    height: 37px !important;
     border-radius: 1px !important;
     background-color: #F4F4F4 !important;
-    padding: 1rem;
+    padding-left: 1rem;
 }
 
-@media (max-width: 600px) {
-    .background {
-        width: 100px;
-        padding-left: 1rem;
-    }
+.table-secondary, .table-secondary > td, .table-secondary > th {
+    background-color: #5ac4c4 !important;
+    color: rgba(0,0,0,.87) !important;
 }
 
-@media (max-width: 450px) {
-    .background {
-        width: 50px;
-        padding-left: 1rem;
-    }
+.table {
+    --bs-table-hover-bg: #d7d9dd !important;
 }
+
+strong {
+    font-weight: bolder !important;
+}
+
+
+    @media (max-width: 600px) {
+        .background {
+            width: 100px;
+            padding-left: 1rem;
+        }
+    }
+
+    @media (max-width: 450px) {
+        .background {
+            width: 50px;
+            padding-left: 1rem;
+        }
+    }

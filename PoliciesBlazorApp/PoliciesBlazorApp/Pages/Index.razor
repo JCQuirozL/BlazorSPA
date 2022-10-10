@@ -13,304 +13,279 @@
 
 <h5>Pólizas por cobrar</h5>
 
-@*<DataGrid TItem="Data" Data="@PoliciesList.Data" Sortable="true" Editable="true" ShowPager="true" PageSize="3" Hoverable="true" Responsive
-          EditMode="DataGridEditMode.Popup" FixedHeader="true" Resizable ResizeMode="TableResizeMode.Header">
-    <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="Póliza" />
-    <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="Prima Total" DisplayFormat="{0:C}"
-                    DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-    <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="Folio Pago" Editable="true" />
-    <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="Banco" Editable="true" Width="200px" />
-    <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="No. Cuenta" Editable="true" />
-    <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="Fecha Depósito" Editable="true" />
-    <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="Importe Depositado" Editable="true" DisplayFormat="{0:C}"
-                    DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-    <DataGridColumn TItem="Data" Field="Leasing.ReferenceId" Caption="Referencia" Editable="true" />
-    <DataGridColumn TItem="Data" Field="Clipert.Certificate" Caption="No. Cert." Displayable="false" />
-    <DataGridColumn TItem="Data" Field="Clipert.Invoice" Caption="No. Fact." />
-    <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="Fecha Emisión" />
-    <DataGridColumn TItem="Data" Field="Clipert.EmmiterCenter" Caption="Centro Emisor" Displayable="false" />
-    <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="Validada" Editable="true">
-        <DisplayTemplate>
-            <Check TValue="Boolean" Checked="context.Validated" Disabled="true" />
-        </DisplayTemplate>
-    </DataGridCheckColumn>
-    <DataGridColumn TItem="Data" Caption="Comentarios">
-        <DisplayTemplate>
-            <Button Color="Color.Default" Width="Width.Auto">Ver</Button>
-        </DisplayTemplate>
-    </DataGridColumn>
-    <DataGridCommandColumn TItem="Data" DeleteCommandAllowed=false>
-        <NewCommandTemplate>
-            <TableRowHeader>Acciones</TableRowHeader>
-        </NewCommandTemplate>
-        <EditCommandTemplate>
-            <Button Color="Color.Secondary" Clicked="@context.Clicked">Editar</Button>
-            <div style="padding:3px;"></div>
-            <Button Color="Color.Primary" Clicked="@context.Clicked">Detalle</Button>
-        </EditCommandTemplate>
-    </DataGridCommandColumn>
-
-</DataGrid>*@
-
-@*search fields*@
-<div style="padding:.5rem;" class="container">
-    <div class="row">
-        <div class="col-4">
-            <TextEdit Class="col-12 background" Placeholder="Número de póliza" Color="Colores.AzulBBVA" @bind-Text="@policyFilter"></TextEdit>
-        </div>
-        <div class="col-4">
+<LoadingIndicator @ref=loadingIndicator FullScreen FadeIn>
+    <ChildContent>
+        @*search fields*@
+        <div style="padding:2rem;" class="col-9">
             <div class="row">
-                <div class="col-6">
-                    <DatePicker Class="col-12 background" Placeholder="Fecha inicial" @bind-Date="@startDateFilter"></DatePicker>
+                <div class="col-4">
+                    <TextEdit Class="col-12 background" Placeholder="Número de póliza" Color="Colores.AzulBBVA" @bind-Text="@policyFilter"></TextEdit>
                 </div>
-                @*</div>
-                <div class="col-3">*@
-                <div class="col-6">
-                    <DatePicker Class="col-12 background" Placeholder="Fecha final" @bind-Date="@endDateFilter"></DatePicker>
+                <div class="col-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <DatePicker Class="col-12 background" Placeholder="Fecha inicial" @bind-Date="@startDateFilter"></DatePicker>
+                        </div>
+                        @*</div>
+                        <div class="col-3">*@
+                        <div class="col-6">
+                            <DatePicker Class="col-12 background" Placeholder="Fecha final" @bind-Date="@endDateFilter"></DatePicker>
+                        </div>
+                    </div>
                 </div>
-                @*<div class="col-4">
-                <Label Class="col-12">
-                <Icon Name="IconName.CalendarCheck" />
-                </Label>
-                </div>*@
+
+                <div class="col-4">
+                    <Select text Class="col-12 background" TValue="int" @bind-SelectedValue="@validatedFilter">
+                        <SelectItem TValue="int" Value=1>Validada</SelectItem>
+                        <SelectItem TValue="int" Value=2>Por validar</SelectItem>
+                        <SelectItem TValue="int" Value=0>Todas</SelectItem>
+                    </Select>
+
+                </div>
             </div>
         </div>
 
-        <div class="col-4">
-            <Select Class="col-12 background" TValue="bool?" @bind-SelectedValue="@validatedFilter">
-                <SelectItem TValue="bool?" Value="true">Validada</SelectItem>
-                <SelectItem TValue="bool?" Value="false">No validada</SelectItem>
-                <SelectItem TValue="bool?" Value="(bool?)null">Todas</SelectItem>
-            </Select>
 
-        </div>
-    </div>
-</div>
+        @*Grid*@
+        <Div Class="col-9">
+            <Div Padding="Padding.Is3" Class="row">
+                <Paragraph>A continuación se muestran las pólizas <strong>pendientes por validar.</strong></Paragraph>
+            </Div>
+        </Div>
+        <DataGrid TItem="Data"
+                  Data="@PoliciesList.Data"
+                  @bind-SelectedRow="@selectedItem"
+                  Sortable="false"
+                  Editable
+                  ShowPager
+                  PageSize=7
+                  Responsive="true"
+                  EditMode="DataGridEditMode.Popup"
+                  PopupTitleTemplate="@Title"
+                  FixedHeader="true"
+                  Resizable
+                  Hoverable
+                  CommandMode="DataGridCommandMode.Commands"
+                  CustomFilter="@OnCustomFilter"
+                  RowUpdated="@OnPolicyRowUpdated"
+                  UseInternalEditing=true
+                  DetailRowTrigger="@((e)=>e.Item.Policy == selectedItem?.Policy)"
+                  SelectedRowStyling="@OnSelectedRowStyling"
+                  RowStyling="@OnRowStyling" Style="margin-bottom: 0 !important">
+            @*<ButtonRowTemplate>
+            <Button Color="Colores.AzulBBVA" Disabled="(selectedItem.Validated)" Clicked="context.EditCommand.Clicked">Editar</Button>
+            <Button Color="Color.Secondary" Disabled="(selectedItem is null)" Clicked="@ShowDetailsModal">Detalle</Button>
+            </ButtonRowTemplate>*@
+            <DataGridColumns>
+                <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
+                <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
+                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" />
+                <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
+                <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
+                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" />
+                <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
 
-
-@*Grid*@
-
-<DataGrid TItem="Data"
-          Data="@PoliciesList.Data"
-          @bind-SelectedRow="@selectedItem"
-          Editable
-          ShowPager
-          PageSize=7
-          Responsive="true"
-          EditMode="DataGridEditMode.Popup"
-          PopupTitleTemplate="@Title"
-          FixedHeader="true"
-          Resizable
-          Hoverable
-          CommandMode="DataGridCommandMode.ButtonRow"
-          CustomFilter="@OnCustomFilter"
-          RowUpdated="@OnPolicyRowUpdated"
-          UseInternalEditing=true
-          DetailRowTrigger="@((e)=>e.Item == selectedItem)"
-          SelectedRowStyling="@OnSelectedRowStyling"
-          RowStyling="@OnRowStyling"
-          Padding="Padding.Is4">
-    <ButtonRowTemplate>
-        <Button Color="Colores.AzulBBVA" Disabled="(selectedItem.Validated)" Clicked="context.EditCommand.Clicked">Editar</Button>
-        @*<Button Color="Color.Secondary" Disabled="(selectedItem is null)" Clicked="@ShowDetailsModal">Detalle</Button>*@
-    </ButtonRowTemplate>
-
-    <DataGridColumns>
-        <LoadingIndicator @ref=loadingIndicator>
-            <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
-                <SaveCommandTemplate>
-
-                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
-                            Clicked="@context.Clicked">
-                        Guardar
-                    </Button>
-
-                </SaveCommandTemplate>
-                <CancelCommandTemplate>
-                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
-                </CancelCommandTemplate>
-
-            </DataGridCommandColumn>
-
-            <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
-            <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C}"
-                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-            <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
-            <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
-                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("mx-MX")" />
-            <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
-            <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDACIÓN" Editable="true">
-                <DisplayTemplate>
-                    <Check TValue="Boolean" Checked="context.Validated" CheckedChanged="@OnCheckedChange"
-                           Disabled="selectedItem.Validated" Background="Background.Secondary" />
-                </DisplayTemplate>
-            </DataGridCheckColumn>
-            <DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />
-            <DataGridColumn TItem="Data" Caption="COMENTARIOS">
-                <DisplayTemplate>
-                    <Botones Outline="true" Color="Colores.Secondary" Width="Width.Auto" Clicked="@ShowCommentsModal">Ver</Botones>
-                </DisplayTemplate>
-            </DataGridColumn>
-        </LoadingIndicator>
-    </DataGridColumns>
-
-    <DetailRowTemplate>
-        <div class="container">
-            <div class="row">
-                <div class="col-3">
-                    <Field Padding="Padding.Is1">
-                        <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Certificate</Text>
-                    </Field>
-                </div>
-                <div class="col-3">
-                    <Field Padding="Padding.Is1">
-                        <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
-                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.Invoice</Text>
-                    </Field>
-                </div>
-                <div class="col-3">
-                    <Field Padding="Padding.Is1">
-                        <FieldLabel TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
-                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.SendingDateASE</Text>
-                    </Field>
-                </div>
-                <div class="col-3">
-                    <Field Padding="Padding.Is1">
-                        <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
-                        <Text TextWeight="TextWeight.Bold" TextColor="ColorTexto.DetailsColor">@selectedItem.Clipert.EmmiterCenter</Text>
-                    </Field>
-                </div>
-            </div>
-        </div>
-    </DetailRowTemplate>
-</DataGrid>
-
-@*modal comments*@
-<Modal @ref="commentsModalRef">
-    <ModalContent Size="ModalSize.Large">
-        <ModalHeader>
-            <ModalTitle>Comentarios</ModalTitle>
-            @*<CloseButton />*@
-        </ModalHeader>
-        <ModalBody>
-            <DataGrid TItem="PolicyCommentVM"
-                      Data="@selectedItem.Comments"
-                      ShowPager
-                      PageSize="8"
-                      Responsive
-                      FixedHeader
-                      Hoverable
-                      Editable
-                      CommandMode="DataGridCommandMode.ButtonRow"
-                      EditMode="DataGridEditMode.Form"
-                      @bind-SelectedRow="@selectedComment"
-                      SelectedRowStyling="@OnSelectedRowStylingComments"
-                      RowStyling="@OnRowStylingComments"
-                      RowInserted="@OnCommentRowInserted">
-                <DataGridColumns>
-                    <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable />
-                    <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" />
-                    <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" />
-                    <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" />
-                    <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
-                        <SaveCommandTemplate>
-                            <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Colores.AzulBBVA"
+                <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA" Editable="true">
+                    <DisplayTemplate>
+                        <Check TValue="Boolean" Checked="@context.Validated" CheckedChanged="@OnCheckedChange"
+                               Disabled="@context.Validated" Background="Background.Secondary" />
+                    </DisplayTemplate>
+                </DataGridCheckColumn>
+                <DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />
+                <DataGridColumn TItem="Data">
+                    <DisplayTemplate>
+                        <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
+                            <Icon Name="IconName.Comments" IconSize="IconSize.Default" Clicked="@ShowCommentsModal"></Icon>
+                        </Tooltip>
+                        @*<Botones Color="Colores.AzulBBVA" Size="Size.ExtraSmall" Clicked="@ShowCommentsModal">Ver</Botones>*@
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
+                    <SaveCommandTemplate>
+                        <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
+                                Clicked="@context.Clicked" Size="Size.Small">
+                            Guardar
+                        </Button>
+                    </SaveCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked" Size="Size.Small">Cancelar</Button>
+                    </CancelCommandTemplate>
+                    <EditCommandTemplate>
+                        <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
+                            <Button Disabled="@context.Item.Validated" Size="Size.Small" Shadow="Shadow.Remove"
+                                    Outline
                                     Clicked="@context.Clicked">
-                                Guardar
+                                <Icon Name="IconName.Pen" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
                             </Button>
-                        </SaveCommandTemplate>
-                        <CancelCommandTemplate>
-                            <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
-                        </CancelCommandTemplate>
-                    </DataGridCommandColumn>
-                </DataGridColumns>
-                <ButtonRowTemplate>
-                    <Button Color="Colores.AzulBBVA" Disabled="selectedItem.Validated" Clicked="context.NewCommand.Clicked">Nuevo</Button>
-                    <Button Color="Color.Secondary" Clicked="@CloseCommentsModal">Cerrar</Button>
-                </ButtonRowTemplate>
-            </DataGrid>
-        </ModalBody>
-    </ModalContent>
-</Modal>
+                        </Tooltip>
+                        @*<Button Color="Colores.AzulBBVA" Size="Size.ExtraSmall" Clicked="@context.Clicked">Editar</Button>*@
+                    </EditCommandTemplate>
+                </DataGridCommandColumn>
 
-@*modaldetails*@
-<Modal @ref="detailsModalRef">
-    <ModalContent Size="ModalSize.Large">
+            </DataGridColumns>
+
+            <DetailRowTemplate>
+                <div class="container" style="background-color: #F1F1F1;">
+                    <div class="row" style="align-items: end !important;">
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+                                <Text TextWeight="TextWeight.Bold">@context.Clipert.Certificate</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+                                <Text TextWeight="TextWeight.Bold">@context.Clipert.Invoice</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
+                                <Text TextWeight="TextWeight.Bold">@context.Clipert.SendingDateASE</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+                                <Text TextWeight="TextWeight.Bold">@context.Clipert.EmmiterCenter</Text>
+                            </Field>
+                        </div>
+                    </div>
+                </div>
+            </DetailRowTemplate>
+
+        </DataGrid>
+
+        @*modal comments*@
+        <Modal @ref="commentsModalRef">
+            <ModalContent Size="ModalSize.Large">
+                <ModalHeader>
+                    <ModalTitle>Comentarios</ModalTitle>
+                    @*<CloseButton />*@
+                </ModalHeader>
+                <ModalBody>
+                    <DataGrid TItem="PolicyCommentVM"
+                              Data="@selectedItem.Comments"
+                              ShowPager
+                              PageSize="8"
+                              Responsive
+                              FixedHeader
+                              Hoverable
+                              Editable
+                              CommandMode="DataGridCommandMode.ButtonRow"
+                              EditMode="DataGridEditMode.Form"
+                              @bind-SelectedRow="@selectedComment"
+                              SelectedRowStyling="@OnSelectedRowStylingComments"
+                              RowStyling="@OnRowStylingComments"
+                              RowInserted="@OnCommentRowInserted">
+                        <DataGridColumns>
+                            <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable />
+                            <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" />
+                            <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" />
+                            <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" />
+                            <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
+                                <SaveCommandTemplate>
+                                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Colores.AzulBBVA"
+                                            Clicked="@context.Clicked">
+                                        Guardar
+                                    </Button>
+                                </SaveCommandTemplate>
+                                <CancelCommandTemplate>
+                                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">Cancelar</Button>
+                                </CancelCommandTemplate>
+                            </DataGridCommandColumn>
+                        </DataGridColumns>
+                        <ButtonRowTemplate>
+                            <Button Color="Colores.AzulBBVA" Disabled="selectedItem.Validated" Clicked="context.NewCommand.Clicked">Nuevo</Button>
+                            <Button Color="Color.Secondary" Clicked="@CloseCommentsModal">Cerrar</Button>
+                        </ButtonRowTemplate>
+                    </DataGrid>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+
+        @*modaldetails*@
+        @* <Modal @ref="detailsModalRef">
+        <ModalContent Size="ModalSize.Large">
         <ModalHeader>
-            <ModalTitle Style="text-align:center">Detalle de la póliza @selectedItem.Policy</ModalTitle>
-            <CloseButton />
+        <ModalTitle Style="text-align:center">Detalle de la póliza @selectedItem.Policy</ModalTitle>
+        <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Prima Total: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.TotalPremium</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Folio de pago: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.PaymentFolio</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Banco: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.Bank</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Número de cuenta: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.AccountNumber</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de depósito: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DocumentDate</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Importe depositado: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DepositAmount</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Referencia: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.ReferenceId</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Certificate</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Factura: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Invoice</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.SendingDateASE</Text>
-            </Field>
-            <Field Padding="Padding.Is2">
-                <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
-                <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.EmmiterCenter</Text>
-            </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Prima Total: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.TotalPremium</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Folio de pago: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.PaymentFolio</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Banco: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.Bank</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Número de cuenta: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.AccountNumber</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de depósito: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DocumentDate</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Importe depositado: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.DepositAmount</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Referencia: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Leasing.ReferenceId</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Certificate</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.Invoice</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.SendingDateASE</Text>
+        </Field>
+        <Field Padding="Padding.Is2">
+        <FieldLabel Style="font-size:1rem;" TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+        <Text TextColor="TextColor.Secondary">@selectedItem.Clipert.EmmiterCenter</Text>
+        </Field>
         </ModalBody>
-    </ModalContent>
-</Modal>
+        </ModalContent>
+        </Modal>*@
 
-<Snackbar @ref="successSnackBar" Color="SnackbarColor.Info">
-    <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
-        Has validado correctamente la póliza @selectedItem.Policy
-        <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
-    </SnackbarBody>
-</Snackbar>
-<Snackbar @ref="errorSnackBar" Color="SnackbarColor.Danger">
-    <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
-        Ha ocurrido un error validando la información de la póliza @selectedItem.Policy
-        <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
-    </SnackbarBody>
-</Snackbar>
+        @*Snackbar's'*@
+        <Snackbar @ref="successSnackBar" Color="SnackbarColor.Info">
+            <SnackbarBody Style="text-align: center; font-size: 15px; font-weight: 600;">
+                Póliza @selectedItem.Policy editada correctamente
+                <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
+            </SnackbarBody>
+        </Snackbar>
+        <Snackbar @ref="errorSnackBar" Color="SnackbarColor.Danger">
+            <SnackbarBody Style="text-align: center; font-size: 20px; font-weight: 600;">
+                Ha ocurrido un error validando la información de la póliza @selectedItem.Policy
+                <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
+            </SnackbarBody>
+        </Snackbar>
 
-
+    </ChildContent>
+</LoadingIndicator>
 
 @code {
-    
+
+    IMessageService MessageService { get; set; }
+
     LoadingIndicator loadingIndicator { get; set; }
 
     Snackbar successSnackBar;
@@ -318,6 +293,7 @@
     public RenderFragment<PopupTitleContext<Data>> Title { get; set; }
 
     public Data selectedItem = new Data();
+
     public PolicyCommentVM selectedComment = new PolicyCommentVM();
 
     public string Url = "/insurance/v1/policies";
@@ -330,7 +306,7 @@
     private string? policyFilter;
     private DateTime? startDateFilter = null;
     private DateTime? endDateFilter = null;
-    private bool? validatedFilter = null;
+    private int validatedFilter = 2;//Todas
 
     private void OnRowStyling(Data policy, DataGridRowStyling style)
     {
@@ -339,7 +315,7 @@
 
     private void OnSelectedRowStyling(Data policy, DataGridRowStyling style)
     {
-        style.Color = Colores.Light;
+        style.Color = Colores.Secondary;
     }
 
     private void OnRowStylingComments(PolicyCommentVM comments, DataGridRowStyling style)
@@ -360,46 +336,64 @@
         //return true;
 
         //All params
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter != null))
+        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 1))
         {
             return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
         (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) &&
-        (model.Validated.Equals(validatedFilter)) == true;
+        (model.Validated) == true;
+        }
+
+        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 2))
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
+        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) &&
+        (model.Validated == false) == true;
         }
 
         //With emission date and Policy number
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null))
+        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 0))
         {
             return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
         (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) == true;
         }
 
         //Policy and validation
-        if (validatedFilter != null && policyFilter != null)
+        if (validatedFilter == 1 && policyFilter != null)
         {
             return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-            (model.Validated.Equals(validatedFilter)) == true;
+            (model.Validated == true) == true;
+        }
+        if (validatedFilter == 2 && policyFilter != null)
+        {
+            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
+            (model.Validated == false) == true;
         }
 
+
         //Date
-        if ((startDateFilter != null) && (endDateFilter != null))
+        if ((startDateFilter != null) && (endDateFilter != null) && (validatedFilter == 0))
         {
             return (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) == true;
         }
 
         //Policy number
-        if (policyFilter != null)
+        if (policyFilter != null && validatedFilter == 0)
         {
             return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase);
         }
 
         //validation status
-        if (validatedFilter != null)
+        if (validatedFilter == 1)
         {
-            return model.Validated.Equals(validatedFilter) == true;
+            return (model.Validated) == true;
         }
 
-        if (validatedFilter == null)
+        if (validatedFilter == 2)
+        {
+            return (model.Validated == false) == true;
+        }
+
+        if (validatedFilter == 0)
         {
             return true;
         }
@@ -411,6 +405,11 @@
 
     protected override async Task OnInitializedAsync() => await LoadPoliciesAsync();
 
+
+    async Task<Boolean> ShowConfirmMessage()
+    {
+        return await MessageService.Confirm("Seguro que desea validar la información de ésta póliza? /n Ésta información no se podrá deshacer.", "Confirmation") ? true : false;
+    }
 
     async Task OnCheckedChange(Boolean value)
     {
@@ -429,27 +428,31 @@
             };
         try
         {
+            Boolean IsConfirmed = await ShowConfirmMessage();
 
-            await loadingIndicator.Show();
-
-            var policiesWereUpdated = await PatchPoliciesAsync(policy);
-
-            if (policiesWereUpdated)
+            if (IsConfirmed)
             {
-                await LoadPoliciesAsync();
 
-                await loadingIndicator.Hide();
-                await successSnackBar.Show();
-                StateHasChanged();
+                await loadingIndicator.Show();
+
+                var policiesWereUpdated = await PatchPoliciesAsync(policy);
+
+                if (policiesWereUpdated)
+                {
+                    await LoadPoliciesAsync();
+
+                    await loadingIndicator.Hide();
+                    await successSnackBar.Show();
+                    StateHasChanged();
+                }
+                else
+                {
+                    await loadingIndicator.Hide();
+                    errorSnackBar.Location = SnackbarLocation.End;
+                    await errorSnackBar.Show();
+                }
+
             }
-            else
-            {
-                await loadingIndicator.Hide();
-                errorSnackBar.Location = SnackbarLocation.End;
-                await errorSnackBar.Show();
-            }
-
-
         }
         catch (Exception ex)
         {
