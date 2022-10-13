@@ -1,6 +1,8 @@
 ﻿
 :root {
     --azulBBVA: #1973b7;
+    --darkBlueBBVA: #072146;
+    --lightBlueBBVA: #DEF2FE;
 }
 
 @font-face {
@@ -31,7 +33,18 @@ body {
     color: #fff !important;
     background-color: var(--azulBBVA) !important;
     font-weight: 600 !important;
+    transition: all .3s !important;
 }
+
+    .btn-primary:hover {
+        background-color: var(--darkBlueBBVA) !important;
+        box-shadow: none;
+    }
+
+    .btn-primary:active {
+        opacity: .5 !important;
+    }
+
 
 .btn-secondary {
     background-color: #fff !important;
@@ -236,7 +249,7 @@ span {
 }
 
 .centered {
-    display: flex!important;
+    display: flex !important;
     justify-content: center !important;
 }
 
@@ -244,9 +257,31 @@ span {
     font-size: 80px !important;
 }
 
-.air-top{
-    padding-top: 10rem;
+.air-top {
+    padding: 8rem 0 0 1rem;
 }
-.b-numeric-handler-wrap{
+
+.b-numeric-handler-wrap {
     visibility: hidden !important;
+}
+
+.btn {
+    box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%), 0 3px 1px -2px rgb(0 0 0 / 20%) !important;
+}
+
+p::selection, label::selection, span::selection, th::selection, td::selection, input::selection {
+    color: var(--lightBlueBBVA) !important;
+    background: var(--darkBlueBBVA) !important;
+}
+
+.from-to {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0;
+}
+
+.nbar-bg{
+    background-color: var(--darkBlueBBVA) !important;
+    height: fit-content !important;
 }

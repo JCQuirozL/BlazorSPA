@@ -11,35 +11,53 @@
 
 <PageTitle>Pólizas</PageTitle>
 
-<h5 class="air-top">Pólizas por cobrar</h5>
+
+<Heading Size="HeadingSize.Is5" Class="air-top">Pólizas por cobrar</Heading>
+
+
 
 <LoadingIndicator @ref=loadingIndicator FullScreen SpinnerColor="Color.Secondary">
     @*search fields*@
-    <div style="padding:2rem;" class="col-9">
-        <div class="row">
-            <div class="col-4">
-                <TextEdit Class="col-12 background" Placeholder="Número de póliza" Color="Colores.AzulBBVA" @bind-Text="@policyFilter"></TextEdit>
-            </div>
-            <div class="col-4">
-                <div class="row">
-                    <div class="col-6">
-                        <DatePicker Class="col-12 background" Placeholder="Fecha inicial" @bind-Date="@startDateFilter"></DatePicker>
-                    </div>
-                    @*</div>
-                    <div class="col-3">*@
-                    <div class="col-6">
-                        <DatePicker Class="col-12 background" Placeholder="Fecha final" @bind-Date="@endDateFilter"></DatePicker>
-                    </div>
+    <div class="row">
+        <div style="padding:2rem;" class="col-10">
+            <div class="row">
+                <div class="col-3">
+                    <TextEdit Class="col-12 background"
+                              Placeholder="Número de póliza"
+                              Color="Colores.AzulBBVA"
+                              @bind-Text="@policyFilter">
+                    </TextEdit>
                 </div>
-            </div>
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-1 from-to">
+                            <Label Style="font-size: 1rem;">De:</Label>
+                        </div>
+                        <div class="col-5">
+                            <DatePicker Class="col-12 background"
+                                        Placeholder="Fecha emisión inicio" @bind-Date="@startDateFilter">
+                            </DatePicker>
+                        </div>
+                        <div class="col-1 from-to">
+                            <Label Style="font-size: 1rem;">A:</Label>
+                        </div>
+                        <div class="col-5">
+                            <DatePicker Class="col-12 background"
+                                        Placeholder="Fecha emisión fin" @bind-Date="@endDateFilter">
+                            </DatePicker>
+                        </div>
+                    </div>
 
-            <div class="col-4">
-                <Select text Class="col-12 background" TValue="int" @bind-SelectedValue="@validatedFilter">
-                    <SelectItem TValue="int" Value=1>Validada</SelectItem>
-                    <SelectItem TValue="int" Value=2>Por validar</SelectItem>
-                    <SelectItem TValue="int" Value=0>Todas</SelectItem>
-                </Select>
+                </div>
 
+                <div class="col-2">
+                    <Select text Class="col-12 background" TValue="int" @bind-SelectedValue="@validatedFilter">
+                        <SelectItem TValue="int" Value=1>Validada</SelectItem>
+                        <SelectItem TValue="int" Value=2>Por validar</SelectItem>
+                        <SelectItem TValue="int" Value=0>Todas</SelectItem>
+                    </Select>
+
+                </div>
             </div>
         </div>
     </div>
@@ -51,121 +69,132 @@
             <Paragraph>A continuación se muestran las pólizas <strong>pendientes por validar.</strong></Paragraph>
         </Div>
     </Div>
+    <Div Class="col-12">
+        <DataGrid TItem="Data"
+                  Data="@PoliciesList.Data"
+                  @bind-SelectedRow="@selectedItem"
+                  Sortable="false"
+                  Editable
+                  ShowPager
+                  PageSize=6
+                  Responsive="true"
+                  EditMode="DataGridEditMode.Popup"
+                  FixedHeader="true"
+                  Resizable
+                  Hoverable
+                  CommandMode="DataGridCommandMode.Commands"
+                  CustomFilter="@OnCustomFilter"
+                  RowUpdated="@OnPolicyRowUpdated"
+                  UseInternalEditing=true
+                  DetailRowTrigger="@((e)=>e.Item.Policy == selectedItem?.Policy)"
+                  SelectedRowStyling="@OnSelectedRowStyling"
+                  RowStyling="@OnRowStyling" Style="margin-bottom: 0 !important" UseValidation>
+            @* <PageButtonTemplate>
 
-    <DataGrid TItem="Data"
-              Data="@PoliciesList.Data"
-              @bind-SelectedRow="@selectedItem"
-              Sortable="false"
-              Editable
-              ShowPager
-              PageSize=6
-              Responsive="true"
-              EditMode="DataGridEditMode.Popup"
-              FixedHeader="true"
-              Resizable
-              Hoverable
-              CommandMode="DataGridCommandMode.Commands"
-              CustomFilter="@OnCustomFilter"
-              RowUpdated="@OnPolicyRowUpdated"
-              UseInternalEditing=true
-              DetailRowTrigger="@((e)=>e.Item.Policy == selectedItem?.Policy)"
-              SelectedRowStyling="@OnSelectedRowStyling"
-              RowStyling="@OnRowStyling" Style="margin-bottom: 0 !important">
-        @* <PageButtonTemplate>
+            </PageButtonTemplate>*@
+            <PopupTitleTemplate>
+                <ModalTitle>
+                    Editar póliza
+                </ModalTitle>
+            </PopupTitleTemplate>
+            <DataGridColumns>
+                <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
+                <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
+                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" />
+                <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
+                <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
+                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" />
+                <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
+                <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
 
-        </PageButtonTemplate>*@
-        <PopupTitleTemplate>
-            <ModalTitle>
-                Editar póliza
-            </ModalTitle>
-        </PopupTitleTemplate>
-        <DataGridColumns>
-            <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" />
-            <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
-                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" />
-            <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="200px" />
-            <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
-                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat"/>
-            <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" />
-            <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" />
-
-            <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA">
-                <DisplayTemplate>
-                    <Div Class="centered">
-                        <Check TValue="Boolean" Checked="@context.Validated" CheckedChanged="@ShowCheckedConfirmMessage"
-                               Disabled="@context.Validated" Background="Background.Secondary" />
-                    </Div>
-                </DisplayTemplate>
-            </DataGridCheckColumn>
-            <DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />
-            <DataGridColumn TItem="Data" Caption="ACCIONES">
-                <DisplayTemplate>
-                    <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
-                        <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
-                    </Tooltip>
-                </DisplayTemplate>
-            </DataGridColumn>
-            <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
-                <SaveCommandTemplate>
-                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
-                            Clicked="@context.Clicked" Size="Size.ExtraLarge">
-                        Guardar
-                    </Button>
-                </SaveCommandTemplate>
-                <CancelCommandTemplate>
-                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked" Size="Size.ExtraLarge">Cancelar</Button>
-                </CancelCommandTemplate>
-                <EditCommandTemplate>
-                    <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
-                        <Button Style="min-width: 1rem !important; background-color: transparent !important;" Disabled="@context.Item.Validated" Size="Size.ExtraSmall" Shadow="Shadow.Remove"
-                                Outline
-                                Clicked="@context.Clicked">
-                            <Icon Name="IconName.Pen" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA">
+                    <DisplayTemplate>
+                        <Div Class="centered">
+                            <Check TValue="Boolean" Checked="@context.Validated" CheckedChanged="@ShowCheckedConfirmMessage"
+                                   Disabled="@context.Validated" Background="Background.Secondary" />
+                        </Div>
+                    </DisplayTemplate>
+                </DataGridCheckColumn>
+                @*<DataGridColumn TItem="Data" Field="@nameof(Data.UpdateDate)" Caption="ÚLTIMA MODIF." />*@
+                <DataGridColumn TItem="Data" Caption="ACCIONES" Width="5%">
+                    <DisplayTemplate>
+                        <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
+                            <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
+                        </Tooltip>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
+                    <SaveCommandTemplate>
+                        <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
+                                Clicked="@context.Clicked" Size="Size.ExtraLarge">
+                            Guardar
                         </Button>
-                    </Tooltip>
-                </EditCommandTemplate>
-            </DataGridCommandColumn>
+                    </SaveCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked" Size="Size.ExtraLarge">Cancelar</Button>
+                    </CancelCommandTemplate>
+                    <EditCommandTemplate>
+                        <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
+                            <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Disabled="@context.Item.Validated" Size="Size.ExtraSmall"
+                                    Outline
+                                    Clicked="@context.Clicked">
+                                <Icon Name="IconName.Pen" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                            </Button>
+                        </Tooltip>
+                    </EditCommandTemplate>
+                </DataGridCommandColumn>
 
 
 
-        </DataGridColumns>
+            </DataGridColumns>
 
-        @*DetailRow Template*@
-        <DetailRowTemplate>
-            <div class="container" style="background-color: #F1F1F1;">
-                <div class="row" style="align-items: end !important;">
-                    <div class="col-3">
-                        <Field Padding="Padding.Is1">
-                            <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                            <Text>@context.Clipert.Certificate</Text>
-                        </Field>
-                    </div>
-                    <div class="col-3">
-                        <Field Padding="Padding.Is1">
-                            <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
-                            <Text>@context.Clipert.Invoice</Text>
-                        </Field>
-                    </div>
-                    <div class="col-3">
-                        <Field Padding="Padding.Is1">
-                            <FieldLabel TextWeight="TextWeight.Bold">Fecha de emisión: </FieldLabel>
-                            <Text>@context.Clipert.SendingDateASE</Text>
-                        </Field>
-                    </div>
-                    <div class="col-3">
-                        <Field Padding="Padding.Is1">
-                            <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
-                            <Text>@context.Clipert.EmmiterCenter</Text>
-                        </Field>
+            @*DetailRow Template*@
+            <DetailRowTemplate>
+                <div class="container" style="background-color: #F1F1F1;">
+                    <div class="row" style="align-items: end !important;">
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+                                <Text>@context.Clipert.Certificate</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+                                <Text>@context.Clipert.Invoice</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+                                <Text>@context.Clipert.EmmiterCenter</Text>
+                            </Field>
+                        </div>
+                        <div class="col-3">
+                            <Field Padding="Padding.Is1">
+                                <FieldLabel TextWeight="TextWeight.Bold">Última modificación: </FieldLabel>
+                                @{
+                                    if ((context.UpdateDate) == null)
+                                    {
+                                        <Text> Sin modificación</Text>
+                                    }
+
+                                    else
+                                    {
+                                        <Text>@context.UpdateDate</Text>
+                                    }
+
+                                }
+                            </Field>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </DetailRowTemplate>
-    </DataGrid>
-
+            </DetailRowTemplate>
+        </DataGrid>
+    </Div>
 
     @*modal comments*@
     <Modal @ref="commentsModalRef">
@@ -188,7 +217,8 @@
                           @bind-SelectedRow="@selectedComment"
                           SelectedRowStyling="@OnSelectedRowStylingComments"
                           RowStyling="@OnRowStylingComments"
-                          RowInserted="@OnCommentRowInserted">
+                          RowInserted="@OnCommentRowInserted"
+                          UseValidation>
                     <DataGridColumns>
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable />
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" />
@@ -196,7 +226,7 @@
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" Displayable="false" />
                         <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
                             <SaveCommandTemplate>
-                                <Button Size="Size.ExtraLarge" ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Colores.AzulBBVA"
+                                <Button Size="Size.ExtraLarge" ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
                                         Clicked="@context.Clicked">
                                     Guardar
                                 </Button>
@@ -207,7 +237,7 @@
                         </DataGridCommandColumn>
                     </DataGridColumns>
                     <ButtonRowTemplate>
-                        <Button Size="Size.ExtraLarge" Color="Colores.AzulBBVA" Disabled="selectedItem.Validated" Clicked="context.NewCommand.Clicked">Nuevo</Button>
+                        <Button Size="Size.ExtraLarge" Color="Color.Primary" Disabled="selectedItem.Validated" Clicked="context.NewCommand.Clicked">Nuevo</Button>
                         <Button Size="Size.ExtraLarge" Color="Color.Secondary" Clicked="@CloseCommentsModal">Cerrar</Button>
                     </ButtonRowTemplate>
                 </DataGrid>
