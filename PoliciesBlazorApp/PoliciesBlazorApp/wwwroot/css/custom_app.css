@@ -136,7 +136,7 @@ body {
 
 
 .background {
-    height: 37px !important;
+    height: 48px !important;
     border-radius: 1px !important;
     background-color: #F4F4F4 !important;
     padding-left: 1rem;
@@ -255,10 +255,11 @@ span {
 
 .material-icons {
     font-size: 80px !important;
+    color: #1973B8;
 }
 
-.air-top {
-    padding: 8rem 0 0 1rem;
+.material-icons-two-tone {
+    color: #1973B8;
 }
 
 .b-numeric-handler-wrap {
@@ -284,4 +285,8 @@ p::selection, label::selection, span::selection, th::selection, td::selection, i
 .nbar-bg{
     background-color: var(--darkBlueBBVA) !important;
     height: fit-content !important;
+}
+
+.top-air {
+    margin: 7rem 0 3rem 1rem;
 }

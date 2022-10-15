@@ -7,6 +7,7 @@
 
         public ClipertData Clipert { get; set; }
 
+        public int Term { get; set; }
         public Boolean Validated { get; set; }
         public DateTime? UpdateDate { get; set; }
         public List<PolicyCommentVM> Comments { get; set; }

@@ -6,6 +6,10 @@ namespace PoliciesBlazorApp.Models
     {
         public DateTime? ValidationDate { get; set; }
 
+        [Required(ErrorMessage = "El número de serie no puede quedar vacío")]
+        public String Serial { get; set; }
+
+
         [Required(ErrorMessage = "El número de folio no puede quedar vacío")]
         public String PaymentFolio { get; set; }
 
