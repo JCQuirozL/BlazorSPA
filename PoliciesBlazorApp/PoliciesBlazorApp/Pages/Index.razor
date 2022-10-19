@@ -5,6 +5,8 @@
 @using System.Net.Http.Headers
 @using System.Linq
 @using System.Text
+@using PoliciesBlazorApp.EventsNMethods
+@using PoliciesBlazorApp.Services
 
 
 @inject HttpClient Http
@@ -25,7 +27,7 @@
                     <TextEdit Class="col-12 background"
                               Placeholder="Número de póliza"
                               Color="Colores.AzulBBVA"
-                              @bind-Text="@policyFilter">
+                              @bind-Text="@Events.PolicyFilter">
                     </TextEdit>
                 </Div>
                 <Div Class="col-7">
@@ -35,7 +37,7 @@
                         </Div>
                         <Div Class="col-5">
                             <DatePicker Class="col-12 background"
-                                        Placeholder="Fecha emisión inicio" @bind-Date="@startDateFilter">
+                                        Placeholder="Fecha emisión inicio" @bind-Date="@Events.StartDateFilter">
                             </DatePicker>
                         </Div>
                         <Div Class="col-1 from-to">
@@ -43,7 +45,7 @@
                         </Div>
                         <Div Class="col-5">
                             <DatePicker Class="col-12 background"
-                                        Placeholder="Fecha emisión fin" @bind-Date="@endDateFilter">
+                                        Placeholder="Fecha emisión fin" @bind-Date="@Events.EndDateFilter">
                             </DatePicker>
                         </Div>
                     </Div>
@@ -51,7 +53,7 @@
                 </Div>
 
                 <Div Class="col-2">
-                    <Select Class="col-12 background" TValue="int" @bind-SelectedValue="@validatedFilter">
+                    <Select Class="col-12 background" TValue="int" @bind-SelectedValue="@Events.ValidatedFilter">
                         <SelectItem TValue="int" Value=1>Validada</SelectItem>
                         <SelectItem TValue="int" Value=2>Por validar</SelectItem>
                         <SelectItem TValue="int" Value=0>Todas</SelectItem>
@@ -70,170 +72,172 @@
             <Paragraph>A continuación se muestran las pólizas <strong>pendientes por validar.</strong></Paragraph>
         </Div>
     </Div>
-    <Div Class="col-12">
-        <DataGrid TItem="Data"
-                  Data="@PoliciesList.Data"
-                  @bind-SelectedRow="@selectedItem"
-                  Sortable="false"
-                  Editable
-                  ShowPager
-                  PageSize=6
-                  Responsive="true"
-                  EditMode="DataGridEditMode.Popup"
-                  FixedHeader="true"
-                  Resizable
-                  Hoverable
-                  CommandMode="DataGridCommandMode.Commands"
-                  CustomFilter="@OnCustomFilter"
-                  RowUpdated="@OnPolicyRowUpdated"
-                  UseInternalEditing=true
-                  DetailRowTrigger="@((e)=>e.Item.Policy == selectedItem?.Policy)"
-                  SelectedRowStyling="@OnSelectedRowStyling"
-                  RowStyling="@OnRowStyling" Style="margin-bottom: 0 !important" UseValidation>
-            <PopupTitleTemplate>
-                <ModalTitle>
-                    Editar póliza
-                </ModalTitle>
-            </PopupTitleTemplate>
-            <DataGridColumns>
-                <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" Width="7%"/>
-                <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.Serial" Caption="NO. SERIE" Editable="true" Width="7%"/>
-                <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
-                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%"/>
-                <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" Width="18%"/>
-                <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="7%"/>
-                <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" Width="7%"/>
-                <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" DisplayFormat="{0:dd/MM/yyyy}" Width="7%"/>
-                <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
-                                DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%"/>
-                <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" Width="5%"/>
-                <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" DisplayFormat="{0:dd/MM/yyyy}" Width="7%"/>
+    <DataGrid TItem="Data"
+              Data="@Policies.PoliciesList.Data"
+              @bind-SelectedRow="@SelectedItem"
+              Sortable="false"
+              Editable
+              ShowPager
+              PageSize=5
+              Responsive="true"
+              EditMode="DataGridEditMode.Popup"
+              FixedHeader="true"
+              Resizable
+              Hoverable
+              CommandMode="DataGridCommandMode.Commands"
+              CustomFilter="@Events.OnCustomFilter"
+              RowUpdated="@OnPolicyRowUpdated"
+              UseInternalEditing=true
+              DetailRowTrigger="@OnDetailRowShow"
+              SelectedRowStyling="@Events.OnSelectedRowStyling"
+              RowStyling="@Events.OnRowStyling" Style="margin-bottom: 0 !important;" UseValidation>
+        <PopupTitleTemplate>
+            <ModalTitle>
+                Editar póliza
+            </ModalTitle>
+        </PopupTitleTemplate>
+        <DataGridColumns>
+            <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="Data" Field="Leasing.Serial" Caption="NO. SERIE" Editable="true" Width="14%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
+                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="14%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" DisplayFormat="{0:dd/MM/yyyy}" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
+                            DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" Width="5%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" DisplayFormat="{0:dd/MM/yyyy}" Width="7%" TextAlignment="TextAlignment.Center" />
 
-                <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA" Width="5%">
-                    <DisplayTemplate>
-                        <Div Class="centered">
-                            @{
-                                var date = context.Clipert.SendingDateASE;
-                                var limitTerm = date.AddDays(Convert.ToDouble(context.Term));
-                                TimeSpan term = limitTerm - DateTime.Now;
-
-                                if (term.Days < 0)
-                                {
-                                    <Check TValue="Boolean" Disabled
-                                   Background="Background.Secondary"/>
-                                }
-                                else
-                                {
-                                    <Check TValue="Boolean" Checked="@context.Validated" Disabled="@context.Validated" CheckedChanged="@ShowCheckedConfirmMessage"
-                                   Background="Background.Secondary" />
-                                }
-                            }
-                        </Div>
-                    </DisplayTemplate>
-                </DataGridCheckColumn>
-                <DataGridColumn TItem="Data" Width="5%">
-                    <DisplayTemplate>
-                        <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
-                            <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
-                        </Tooltip>
-                    </DisplayTemplate>
-                </DataGridColumn>
-                <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
-                    <SaveCommandTemplate>
-                        <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
-                                Clicked="@context.Clicked" Size="Size.ExtraLarge">
-                            Guardar
-                        </Button>
-                    </SaveCommandTemplate>
-                    <CancelCommandTemplate>
-                        <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked" Size="Size.ExtraLarge">Cancelar</Button>
-                    </CancelCommandTemplate>
-                    <EditCommandTemplate>
+            <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA" Width="5%">
+                <DisplayTemplate>
+                    <Div Class="centered">
                         @{
-                            var date = context.Item.Clipert.SendingDateASE;
-                            var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
+                            var date = context.Clipert.SendingDateASE;
+                            var limitTerm = date.AddDays(Convert.ToDouble(context.Term));
                             TimeSpan term = limitTerm - DateTime.Now;
 
                             if (term.Days < 0)
                             {
-                                //<Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Disabled Outline>
-                                //    <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
-                                //</Button>
+                                <Check TValue="Boolean" Disabled
+                               Background="Background.Secondary" />
                             }
                             else
                             {
-                                <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
-                                    <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
-                                        <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
-                                    </Button>
-                                </Tooltip>
+                                <Check TValue="Boolean" Checked="@context.Validated" Disabled="@context.Validated" CheckedChanged="@ShowCheckedConfirmMessage"
+                               Background="Background.Secondary" />
+                            }
+                        }
+                    </Div>
+                </DisplayTemplate>
+            </DataGridCheckColumn>
+            <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Width="5%">
+                <DisplayTemplate>
+                    <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
+                        <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
+                    </Tooltip>
+                </DisplayTemplate>
+            </DataGridColumn>
+            <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
+                <SaveCommandTemplate>
+                    <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
+                            Clicked="@context.Clicked" Size="Size.ExtraLarge">
+                        Guardar
+                    </Button>
+                </SaveCommandTemplate>
+                <CancelCommandTemplate>
+                    <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked" Size="Size.ExtraLarge">Cancelar</Button>
+                </CancelCommandTemplate>
+                <EditCommandTemplate>
+                    @{
+                        var date = context.Item.Clipert.SendingDateASE;
+                        var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
+                        TimeSpan term = limitTerm - DateTime.Now;
+
+                        if (term.Days < 0)
+                        {
+                            //<Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Disabled Outline>
+                            //    <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                            //</Button>
+                        }
+                        else
+                        {
+                            <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
+                                <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
+                                    <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                                </Button>
+                            </Tooltip>
+                        }
+
+                    }
+                </EditCommandTemplate>
+            </DataGridCommandColumn>
+
+
+
+        </DataGridColumns>
+
+        @*------------------------------------DetailRow Template ---------------------------------------------------------*@
+        <DetailRowTemplate>
+            @*<div class="container" style="background-color: #F1F1F1; margin:0 !important">*@
+            <Div Class="row" Style="background-color: #F1F1F1;align-items: end !important;">
+                <Div Class="col-1"></Div>
+                <Div Class="col-3">
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
+                        <Text>@context.Clipert.Certificate</Text>
+                    </Field>
+                </Div>
+                <Div Class="col-2">
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
+                        <Text>@context.Clipert.Invoice</Text>
+                    </Field>
+                </Div>
+                @*<Div Class="col-1"></Div>*@
+                <Div Class="col-2">
+                    <Field TextAlignment="TextAlignment.Center" Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
+                        <Text>@context.Clipert.EmmiterCenter</Text>
+                    </Field>
+                </Div>
+                <Div Class="col-1"></Div>
+                <Div Class="col-3">
+                    <Field Padding="Padding.Is1">
+                        <FieldLabel TextWeight="TextWeight.Bold">Última modificación: </FieldLabel>
+                        @{
+                            if ((context.UpdateDate) == null)
+                            {
+                                <Text> Sin modificación</Text>
+                            }
+
+                            else
+                            {
+                                <Text> @context.UpdateDate</Text>
                             }
 
                         }
-                    </EditCommandTemplate>
-                </DataGridCommandColumn>
+                    </Field>
+                </Div>
+            </Div>
+            @*</div>*@
+        </DetailRowTemplate>
+    </DataGrid>
 
 
-
-            </DataGridColumns>
-
-            @*------------------------------------DetailRow Template ---------------------------------------------------------*@
-            <DetailRowTemplate>
-                @*<div class="container" style="background-color: #F1F1F1; margin:0 !important">*@
-                    <div class="row" style="background-color: #F1F1F1;align-items: end !important;">
-                        <div class="col-3">
-                            <Field Padding="Padding.Is1">
-                                <FieldLabel TextWeight="TextWeight.Bold">Certificado: </FieldLabel>
-                                <Text>@context.Clipert.Certificate</Text>
-                            </Field>
-                        </div>
-                        <div class="col-2">
-                            <Field Padding="Padding.Is1">
-                                <FieldLabel TextWeight="TextWeight.Bold">Factura: </FieldLabel>
-                                <Text>@context.Clipert.Invoice</Text>
-                            </Field>
-                        </div>
-                        <div class="col-2">
-                            <Field TextAlignment="TextAlignment.Center" Padding="Padding.Is1">
-                                <FieldLabel TextWeight="TextWeight.Bold">Centro emisor: </FieldLabel>
-                                <Text>@context.Clipert.EmmiterCenter</Text>
-                            </Field>
-                        </div>
-                        <div class="col-5">
-                            <Field Padding="Padding.Is1">
-                                <FieldLabel TextWeight="TextWeight.Bold">Última modificación: </FieldLabel>
-                                @{
-                                    if ((context.UpdateDate) == null)
-                                    {
-                                        <Text> Sin modificación</Text>
-                                    }
-
-                                    else
-                                    {
-                                        <Text> @context.UpdateDate</Text>
-                                    }
-
-                                }
-                            </Field>
-                        </div>
-                    </div>
-                @*</div>*@
-            </DetailRowTemplate>
-        </DataGrid>
-    </Div>
-
-    @*modal comments*@
-    <Modal @ref="commentsModalRef">
+    @*--------------------------------------------------------->modal comments<----------------------------------------------*@
+    <Modal @ref="commentsModalRef" Animated AnimationDuration="550" FocusTrap="true" ShowBackdrop>
         <ModalContent Size="ModalSize.Large">
             <ModalHeader>
-                <ModalTitle>Comentarios</ModalTitle>
+                <ModalTitle>Comentarios de la póliza @SelectedItem.Policy</ModalTitle>
                 <CloseButton Clicked="@CloseCommentsModal" />
             </ModalHeader>
             <ModalBody>
                 <DataGrid TItem="PolicyCommentVM"
-                          Data="@selectedItem.Comments"
+                          Data="@SelectedItem.Comments.OrderByDescending(c=>c.CommentDate)"
                           ShowPager
-                          PageSize="8"
+                          PageSize="5"
                           Responsive
                           FixedHeader
                           Hoverable
@@ -241,19 +245,18 @@
                           CommandMode="DataGridCommandMode.ButtonRow"
                           EditMode="DataGridEditMode.Form"
                           @bind-SelectedRow="@selectedComment"
-                          SelectedRowStyling="@OnSelectedRowStylingComments"
-                          RowStyling="@OnRowStylingComments"
+                          SelectedRowStyling="@Events.OnSelectedRowStylingComments"
+                          RowStyling="@Events.OnRowStylingComments"
                           RowInserted="@OnCommentRowInserted"
                           UseValidation>
                     <DataGridColumns>
-                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%" />
-                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" />
-                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" />
-                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" Displayable="false" />
+                        <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%" />
+                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" TextAlignment="TextAlignment.Center" />
+                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" TextAlignment="TextAlignment.Center" />
+                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" Displayable="false" TextAlignment="TextAlignment.Center" />
                         <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
                             <SaveCommandTemplate>
-                                <Button Size="Size.ExtraLarge" ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
-                                        Clicked="@context.Clicked">
+                                <Button Size="Size.ExtraLarge" ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">
                                     Guardar
                                 </Button>
                             </SaveCommandTemplate>
@@ -263,7 +266,7 @@
                         </DataGridCommandColumn>
                     </DataGridColumns>
                     <ButtonRowTemplate>
-                        <Button Size="Size.ExtraLarge" Color="Color.Primary" Disabled="@selectedItem.Validated" Clicked="@context.NewCommand.Clicked">Nuevo</Button>
+                        <Button Size="Size.ExtraLarge" Color="Color.Primary" Disabled="@SelectedItem.Validated" Clicked="@context.NewCommand.Clicked">Nuevo</Button>
                         <Button Size="Size.ExtraLarge" Color="Color.Secondary" Clicked="@CloseCommentsModal">Cerrar</Button>
                     </ButtonRowTemplate>
                 </DataGrid>
@@ -273,12 +276,12 @@
 
 
 
-    @*Snackbar's'*@
+    @*-------------------------------------------------------->Snackbar's'<--------------------------------------------*@
 
-    <Snackbar @ref="successSnackBar" Color="SnackbarColor.Info">
+    <Snackbar @ref="@successSnackBar" Color="SnackbarColor.Info">
         <Div Class="center-snack">
             <SnackbarBody Style="font-size: 15px; font-weight: 600;">
-                Póliza @selectedItem.Policy validada correctamente
+                Póliza @SelectedItem.Policy validada correctamente
                 <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
             </SnackbarBody>
         </Div>
@@ -292,10 +295,10 @@
         </Div>
     </Snackbar>
 
-    <Snackbar @ref="errorSnackBar" Color="SnackbarColor.Danger">
+    <Snackbar @ref="@errorSnackBar" Color="SnackbarColor.Danger">
         <Div Class="center-snack">
             <SnackbarBody Style="text-align: center; font-size: 15px; font-weight: 600;">
-                No se modificó ningún dato de la póliza @selectedItem.Policy
+                No se modificó ningún dato de la póliza @SelectedItem.Policy
                 <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
             </SnackbarBody>
         </Div>
@@ -313,157 +316,19 @@
     Snackbar errorSnackBar;
     Snackbar commentSnackBar;
 
-
-    public Data selectedItem = new();
-
+    public Data SelectedItem = new();
     public PolicyCommentVM selectedComment = new PolicyCommentVM();
 
-    public string Url = "/insurance/v1/policies";
-    public string Url2 = "/api/PoliciesCollection";
-
-    public BillingData PoliciesList = new();
     private Modal commentsModalRef = new();
     private Modal detailsModalRef = new();
 
-    private string? policyFilter;
-    private DateTime? startDateFilter = null;
-    private DateTime? endDateFilter = null;
-    private int validatedFilter = 2;//Todas
+    protected override async Task OnInitializedAsync() => await Policies.LoadPoliciesAsync();
 
-    private void OnRowStyling(Data policy, DataGridRowStyling style)
+    public Boolean OnDetailRowShow(DetailRowTriggerEventArgs<Data> e)
     {
-        var date = policy.Clipert.SendingDateASE;
-        var limitTerm = date.AddDays(Convert.ToDouble(policy.Term));
-        TimeSpan term = limitTerm - DateTime.Now;
-
-        if (((term.Days < 5) && (term.Days > 0)) && !policy.Validated)
-        {
-            style.Background = Background.Default;
-            style.Style = "color: #d90707";
-        }
-
+        e.Single = true;
+        return ((e.Item.Policy == SelectedItem?.Policy));
     }
-
-    private void OnSelectedRowStyling(Data policy, DataGridRowStyling style)
-    {
-        style.Color = Colores.Secondary;
-    }
-
-    private void OnRowStylingComments(PolicyCommentVM comments, DataGridRowStyling style)
-    {
-        style.Background = Background.Default;
-    }
-
-    private void OnSelectedRowStylingComments(PolicyCommentVM comments, DataGridRowStyling style)
-    {
-        style.Color = Colores.Secondary;
-    }
-
-    private Boolean IsActivePolicy(Data model)
-    {
-        var date = model.Clipert.SendingDateASE;
-        var limitTerm = date.AddDays(Convert.ToDouble(model.Term));
-        TimeSpan days = limitTerm - DateTime.Now;
-
-        if (days.Days < 0)
-        {
-            return false;
-        }
-        return true;
-    }
-    private Boolean OnCustomFilter(Data model)
-    {
-        // We want to accept empty value as valid or otherwise
-        // datagrid will not show anything.
-        //if ((string.IsNullOrEmpty(policyFilter)) || (startDateFilter == null) || (endDateFilter == null) || (validatedFilter.Equals(null)))
-        //return true;
-
-        //All params
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 1))
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) &&
-        (model.Validated) && IsActivePolicy(model) == true;
-        }
-
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 2))
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) &&
-        (model.Validated == false) && IsActivePolicy(model) == true;
-        }
-
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 3))
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-       (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) && !IsActivePolicy(model) == true;
-        }
-
-        //With emission date and Policy number
-        if ((startDateFilter != null) && (endDateFilter != null) && (policyFilter != null) && (validatedFilter == 0))
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-        (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) && IsActivePolicy(model) == true;
-        }
-
-        //Policy and validation
-        if (validatedFilter == 1 && policyFilter != null)
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-            (model.Validated == true) && IsActivePolicy(model) == true;
-        }
-        if (validatedFilter == 2 && policyFilter != null)
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-            (model.Validated == false) && IsActivePolicy(model) == true;
-        }
-
-        if (validatedFilter == 3 && policyFilter != null)
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) &&
-            (model.Validated == false) && !IsActivePolicy(model) == true;
-        }
-
-        //Date
-        if ((startDateFilter != null) && (endDateFilter != null) && (validatedFilter == 0))
-        {
-            return (model.Clipert.SendingDateASE >= startDateFilter && model.Clipert.SendingDateASE <= endDateFilter) && IsActivePolicy(model) == true;
-        }
-
-        //Policy number
-        if (policyFilter != null && validatedFilter == 0)
-        {
-            return model.Policy.Contains(policyFilter, StringComparison.OrdinalIgnoreCase) && IsActivePolicy(model);
-        }
-
-        //validation status
-        if (validatedFilter == 1)
-        {
-            return (model.Validated) && IsActivePolicy(model) == true;
-        }
-
-        if (validatedFilter == 2)
-        {
-            return (model.Validated == false) && IsActivePolicy(model) == true;
-        }
-
-        if (validatedFilter == 0)
-        {
-            return (IsActivePolicy(model)) == true;
-        }
-
-        if (validatedFilter == 3)
-        {
-            return (!IsActivePolicy(model)) == true;
-        }
-
-        return (IsActivePolicy(model)) == true;
-
-
-    }
-
-    protected override async Task OnInitializedAsync() => await LoadPoliciesAsync();
-
 
     async Task ShowCheckedConfirmMessage(Boolean value)
     {
@@ -490,14 +355,15 @@
 
         Policy policy = new()
             {
-                PolicyNumber = selectedItem.Policy,
-                PaymentFolio = selectedItem.Leasing.PaymentFolio,
-                ReferenceId = selectedItem.Leasing.ReferenceId,
-                Bank = selectedItem.Leasing.Bank,
-                Invoice = selectedItem.Clipert.Invoice,
-                AccountNumber = selectedItem.Leasing.AccountNumber,
-                DocumentDate = selectedItem.Leasing.DocumentDate,
-                DepositAmount = selectedItem.Leasing.DepositAmount,
+                PolicyNumber = SelectedItem.Policy,
+                Serial = SelectedItem.Leasing.Serial,
+                PaymentFolio = SelectedItem.Leasing.PaymentFolio,
+                ReferenceId = SelectedItem.Leasing.ReferenceId,
+                Bank = SelectedItem.Leasing.Bank,
+                Invoice = SelectedItem.Clipert.Invoice,
+                AccountNumber = SelectedItem.Leasing.AccountNumber,
+                DocumentDate = SelectedItem.Leasing.DocumentDate,
+                DepositAmount = SelectedItem.Leasing.DepositAmount,
                 Validated = value
             };
         try
@@ -505,11 +371,11 @@
 
             await loadingIndicator.Show();
 
-            var policiesWereUpdated = await PatchPoliciesAsync(policy);
+            var policiesWereUpdated = await Policies.PatchPoliciesAsync(policy);
 
             if (policiesWereUpdated)
             {
-                await LoadPoliciesAsync();
+                await Policies.LoadPoliciesAsync();
 
                 await loadingIndicator.Hide();
                 await successSnackBar.Show();
@@ -537,23 +403,25 @@
 
         PolicyCommentPost commentPost = new()
             {
-                Policy = selectedItem.Policy,
-                Invoice = selectedItem.Clipert.Invoice,
+                Policy = SelectedItem.Policy,
+                Invoice = SelectedItem.Clipert.Invoice,
                 Comment = comment.Comment
             };
 
         try
         {
             await loadingIndicator.Show();
-            var commentWerePosted = await PostCommentAsync(commentPost);
+            var commentWerePosted = await Policies.PostCommentAsync(commentPost);
 
             if (commentWerePosted)
             {
                 await loadingIndicator.Hide();
-                await LoadPoliciesAsync();
+                await Policies.LoadPoliciesAsync();
                 await CloseCommentsModal();
                 await commentSnackBar.Show();
+
                 StateHasChanged();
+                
             }
             else
             {
@@ -567,6 +435,8 @@
             throw;
         }
     }
+
+
     async Task OnPolicyRowUpdated(SavedRowItem<Data, Dictionary<String, object>> e)
     {
 
@@ -575,6 +445,7 @@
             {
                 PolicyNumber = policies.Policy,
                 PaymentFolio = policies.Leasing.PaymentFolio,
+                Serial = policies.Leasing.Serial,
                 ReferenceId = policies.Leasing.ReferenceId,
                 Bank = policies.Leasing.Bank,
                 Invoice = policies.Clipert.Invoice,
@@ -587,11 +458,11 @@
         {
             await loadingIndicator.Show();
 
-            var policiesWereUpdated = await PatchPoliciesAsync(policy);
+            var policiesWereUpdated = await Policies.PatchPoliciesAsync(policy);
 
             if (policiesWereUpdated)
             {
-                await LoadPoliciesAsync();
+                await Policies.LoadPoliciesAsync();
 
                 await loadingIndicator.Hide();
                 await successSnackBar.Show();
@@ -614,70 +485,22 @@
         }
     }
 
-    async Task<Boolean> PatchPoliciesAsync(Policy policy)
-    {
-        PatchPolicies[] model = new[] { new PatchPolicies(policy) };
-
-        var json = JsonConvert.SerializeObject(model);
-        var body = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var request = new HttpRequestMessage(HttpMethod.Patch, Url);
-
-        request.Headers.Add("Session-Id", "10000057cpbas096");
-        request.Content = body;
-
-        using var httpResponse = await Http.SendAsync(request);
-
-        return httpResponse.IsSuccessStatusCode ? true : false;
-    }
-    async Task LoadPoliciesAsync()
-    {
-
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, Url);
-            request.Headers.Add("Session-Id", "10000057cpbas096");
-            using var httpResponse = await Http.SendAsync(request);
-
-            PoliciesList = await httpResponse.Content.ReadFromJsonAsync<BillingData>();
-            //PoliciesList = await Http.GetFromJsonAsync<List<BillingData>>(Url);
-        }
-        catch (Exception)
-        {
-
-            throw;
-        }
-
-    }
-
-    async Task<Boolean> PostCommentAsync(PolicyCommentPost model)
-    {
-        var json = JsonConvert.SerializeObject(model);
-        var body = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var request = new HttpRequestMessage(HttpMethod.Post, Url);
-        request.Headers.Add("Session-Id", "10000057cpbas096");
-        request.Content = body;
-        using var httpResponse = await Http.SendAsync(request);
-
-        return httpResponse.IsSuccessStatusCode ? true : false;
-    }
-
     private Task ShowCommentsModal()
     {
-        //LoadComments(selectedItem.Policy, selectedItem.Clipert.Invoice).Wait();
+
         return commentsModalRef.Show();
+
     }
 
     private Task CloseCommentsModal()
     {
-        //LoadComments(selectedItem.Policy, selectedItem.Clipert.Invoice).Wait();
         return commentsModalRef.Close(CloseReason.None);
     }
 
     private Task ShowDetailsModal()
     {
-        //LoadComments(selectedItem.Policy, selectedItem.Clipert.Invoice).Wait();
+        //LoadComments(SelectedItem.Policy, SelectedItem.Clipert.Invoice).Wait();
         return detailsModalRef.Show();
     }
-        }
+}
+

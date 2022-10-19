@@ -175,10 +175,9 @@ strong {
 }
 
 .page-link {
-    background-color: #043263;
-    color: white !important;
+    color: var(--azulBBVA) !important;
     font-weight: 600 !important;
-    border: 0px;
+    border: none;
 }
 
 .page-item.disabled .page-link {
@@ -226,13 +225,13 @@ label {
 .snackbar-info {
     background-color: #277a3e !important;
     color: #fff !important;
-    min-width: 1366px !important;
+    min-width: 1920px !important;
     min-height: 50px !important;
     margin-bottom: -25px !important;
 }
 
 .snackbar-danger {
-    min-width: 1366px !important;
+    min-width: 1920px !important;
     min-height: 50px !important;
     margin-bottom: -25px !important;
 }
@@ -282,11 +281,28 @@ p::selection, label::selection, span::selection, th::selection, td::selection, i
     padding-right: 0;
 }
 
-.nbar-bg{
+.nbar-bg {
     background-color: var(--darkBlueBBVA) !important;
     height: fit-content !important;
 }
 
 .top-air {
     margin: 7rem 0 3rem 1rem;
+}
+
+.breakin-word {
+    word-break: break-word !important;
+}
+
+th {
+    text-align: center !important;
+}
+
+.table-responsive {
+    max-height: 400px !important;
+    margin-bottom: 1rem;
+}
+
+#btnSave {
+    margin-right: .25rem;
 }

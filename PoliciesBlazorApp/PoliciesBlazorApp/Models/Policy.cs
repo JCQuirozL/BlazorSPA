@@ -4,6 +4,7 @@
     {
         public String PolicyNumber { get; set; }
 
+        public String Serial { get; set; }
         public String PaymentFolio { get; set; }
 
         public String ReferenceId { get; set; }
