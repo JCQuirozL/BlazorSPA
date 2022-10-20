@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
+//ViewModel para el post de comments
 namespace PoliciesBlazorApp.Models
 {
+    using System.ComponentModel.DataAnnotations;
     public class PolicyCommentPost
     {
         public String Policy { get; set; }

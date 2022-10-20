@@ -1,5 +1,6 @@
 ﻿namespace PoliciesBlazorApp.Models
 {
+    //ViewModel para el get de comments
     public class PolicyCommentVM
     {
         public String Comment { get; set; }

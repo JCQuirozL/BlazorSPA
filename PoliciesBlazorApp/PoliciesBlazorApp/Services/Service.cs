@@ -7,13 +7,17 @@ namespace PoliciesBlazorApp.Services
     using PoliciesBlazorApp.Responses;
     using System.Net.Http.Json;
     using System.Text;
-    
-    public static class Policies
+
+    public static class Service
     {
-        public static BillingData PoliciesList = new();
-        static string Url = "/insurance/v1/policies";
-        static string Url2 = "/api/PoliciesCollection";
-        static HttpClient Http = new() { BaseAddress =  new Uri("https://localhost:44391") };
+        #region Globales
+            public static BillingData PoliciesList = new();
+            static readonly string Url = "/insurance/v1/policies";
+            static string Url2 = "/api/PoliciesCollection";
+            static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
+        #endregion
+
+        //Servicio para cargar info de las pólizas
         public static async Task LoadPoliciesAsync()
         {
             try
@@ -34,6 +38,7 @@ namespace PoliciesBlazorApp.Services
 
         }
 
+        //Servicio para hacer el patch de pólizas
         public static async Task<Boolean> PatchPoliciesAsync(Policy policy)
         {
             PatchPolicies[] model = new[] { new PatchPolicies(policy) };
@@ -51,6 +56,7 @@ namespace PoliciesBlazorApp.Services
             return httpResponse.IsSuccessStatusCode ? true : false;
         }
 
+        //Servicio para hacer el post de comentarios
         public static async Task<Boolean> PostCommentAsync(PolicyCommentPost model)
         {
             var json = JsonConvert.SerializeObject(model);

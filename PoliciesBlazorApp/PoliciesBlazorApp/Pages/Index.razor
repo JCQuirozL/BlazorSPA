@@ -1,25 +1,15 @@
 ﻿@page "/"
 @using PoliciesBlazorApp.Models
-@using System.Net.Http
-@using PoliciesBlazorApp.Responses
-@using System.Net.Http.Headers
-@using System.Linq
-@using System.Text
 @using PoliciesBlazorApp.EventsNMethods
 @using PoliciesBlazorApp.Services
 
-
-@inject HttpClient Http
-
 <PageTitle>Pólizas</PageTitle>
-
 
 <Heading Size="HeadingSize.Is5" Class="top-air">Pólizas por cobrar</Heading>
 
-
-
-<LoadingIndicator @ref=loadingIndicator FullScreen SpinnerColor="Color.Secondary">
-    @*search fields*@
+@*LoadingIndicator wrapper, indicador de carga (spinner)*@
+<LoadingIndicator @ref=LoadingIndicator FullScreen SpinnerColor="Color.Secondary">
+    @*search fields, campos de búsqueda*@
     <Div Class="row">
         <Div Style="padding:2rem;" class="col-10">
             <Div Class="row">
@@ -66,14 +56,16 @@
     </Div>
 
 
-    @*---------------------------------------------------------------Grid-----------------------------------------------------------*@
+    @*Texto para guiar al usuario*@
     <Div Class="col-9">
         <Div Padding="Padding.Is3" Class="row">
             <Paragraph>A continuación se muestran las pólizas <strong>pendientes por validar.</strong></Paragraph>
         </Div>
     </Div>
+
+    @*---------------------------------------------------------------Grid-----------------------------------------------------------*@
     <DataGrid TItem="Data"
-              Data="@Policies.PoliciesList.Data"
+              Data="@Service.PoliciesList.Data"
               @bind-SelectedRow="@SelectedItem"
               Sortable="false"
               Editable
@@ -125,7 +117,7 @@
                             }
                             else
                             {
-                                <Check TValue="Boolean" Checked="@context.Validated" Disabled="@context.Validated" CheckedChanged="@ShowCheckedConfirmMessage"
+                                <Check TValue="Boolean" Checked="@context.Validated" Disabled="@context.Validated" CheckedChanged="@OnCheckedChange"
                                Background="Background.Secondary" />
                             }
                         }
@@ -151,17 +143,13 @@
                 </CancelCommandTemplate>
                 <EditCommandTemplate>
                     @{
+                        //Validación para checar la vigencia e la póliza
                         var date = context.Item.Clipert.SendingDateASE;
                         var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
                         TimeSpan term = limitTerm - DateTime.Now;
-
-                        if (term.Days < 0)
-                        {
-                            //<Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Disabled Outline>
-                            //    <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
-                            //</Button>
-                        }
-                        else
+                        //si aún está dentro del plazo (15,30,60 dás, etc) entonces que aún se muestre el botón de editar
+                        //de lo contrario ya no se podrá validar información de la póliza
+                        if (term.Days > 0)
                         {
                             <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
                                 <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
@@ -169,7 +157,6 @@
                                 </Button>
                             </Tooltip>
                         }
-
                     }
                 </EditCommandTemplate>
             </DataGridCommandColumn>
@@ -179,6 +166,7 @@
         </DataGridColumns>
 
         @*------------------------------------DetailRow Template ---------------------------------------------------------*@
+        @*detalle de cada pólzia que se muestra al hacer clic sobre ella*@
         <DetailRowTemplate>
             @*<div class="container" style="background-color: #F1F1F1; margin:0 !important">*@
             <Div Class="row" Style="background-color: #F1F1F1;align-items: end !important;">
@@ -227,6 +215,7 @@
 
 
     @*--------------------------------------------------------->modal comments<----------------------------------------------*@
+    @*modal que se muestra cuando se presiona el botón de ver/editar comentarios*@
     <Modal @ref="commentsModalRef" Animated AnimationDuration="550" FocusTrap="true" ShowBackdrop>
         <ModalContent Size="ModalSize.Large">
             <ModalHeader>
@@ -277,7 +266,8 @@
 
 
     @*-------------------------------------------------------->Snackbar's'<--------------------------------------------*@
-
+    @*el snackbar es un toast*@
+    @*success*@
     <Snackbar @ref="@successSnackBar" Color="SnackbarColor.Info">
         <Div Class="center-snack">
             <SnackbarBody Style="font-size: 15px; font-weight: 600;">
@@ -294,7 +284,7 @@
             </SnackbarBody>
         </Div>
     </Snackbar>
-
+    @*error*@
     <Snackbar @ref="@errorSnackBar" Color="SnackbarColor.Danger">
         <Div Class="center-snack">
             <SnackbarBody Style="text-align: center; font-size: 15px; font-weight: 600;">
@@ -306,38 +296,56 @@
 </LoadingIndicator>
 
 
+
+@*CODEBEHIND*@
 @code {
-    [Inject]
-    IMessageService MessageService { get; set; }
 
-    LoadingIndicator loadingIndicator { get; set; }
+    #region Globales
 
-    Snackbar successSnackBar;
-    Snackbar errorSnackBar;
-    Snackbar commentSnackBar;
+        //Servicio para mandar un 'sweetalert'
+        [Inject]
+        IMessageService? MessageService { get; set; }
 
-    public Data SelectedItem = new();
-    public PolicyCommentVM selectedComment = new PolicyCommentVM();
+        //Spinner
+        LoadingIndicator LoadingIndicator { get; set; } = new();
 
-    private Modal commentsModalRef = new();
-    private Modal detailsModalRef = new();
+        //Toast
+        Snackbar successSnackBar = new();
+        Snackbar errorSnackBar = new();
+        Snackbar commentSnackBar = new();
 
-    protected override async Task OnInitializedAsync() => await Policies.LoadPoliciesAsync();
+        //propiedad para saber en que elemento del DGrid estamos
+        public Data SelectedItem = new();
 
+        //propiedad para saber en que elemento del DGrid de comentarios estamos
+        public PolicyCommentVM selectedComment = new();
+
+        //Modal que contiene la grilla de comentarios
+        private Modal commentsModalRef = new();
+
+    #endregion
+
+    //Evento que se lanza cuándo se carga la pag
+    protected override async Task OnInitializedAsync() => await Service.LoadPoliciesAsync();
+
+    //Evento para mostrar el detalle de cada row
     public Boolean OnDetailRowShow(DetailRowTriggerEventArgs<Data> e)
     {
+        //con ésta propiedad indicamos que el detalle se cerrará al dar clic en la misma fila o en una diferente,
+        //sólo un detalle abierto a la vez
         e.Single = true;
         return ((e.Item.Policy == SelectedItem?.Policy));
     }
 
-    async Task ShowCheckedConfirmMessage(Boolean value)
+    //Evento que se lanza al cambiar al hacer clic en el CheckBox
+    async Task OnCheckedChange(Boolean value)
     {
-
+        //antes de 'validar' la info de las póliza, lanzamos un msg para que el usuario confirme la acción
         try
         {
             if (await MessageService.Confirm("Verificas que los datos son correctos. Hecha ésta acción ya no podrás modificar la información.", "Validación de póliza", opt => { opt.ConfirmButtonText = "Aceptar"; opt.CancelButtonText = "Cancelar"; opt.ShowMessageIcon = true; opt.MessageIcon = IconName.ExclamationCircle; }))
             {
-                await OnCheckedChange(value);
+                await ValidatePolicyInfo(value);
             }
         }
         catch (Exception ex)
@@ -349,8 +357,8 @@
 
     }
 
-
-    async Task OnCheckedChange(Boolean value)
+    //mapeamos los datos de la póliza cuando se valida la info
+    Policy MappedPolicy(Boolean validated)
     {
 
         Policy policy = new()
@@ -364,26 +372,83 @@
                 AccountNumber = SelectedItem.Leasing.AccountNumber,
                 DocumentDate = SelectedItem.Leasing.DocumentDate,
                 DepositAmount = SelectedItem.Leasing.DepositAmount,
-                Validated = value
+                Validated = validated
             };
+
+        return policy;
+    }
+    
+    //Sobrecarga para mapear la póliza cuadno se edita info
+    Policy MappedPolicy(Data policy)
+    {
+        Policy mappedPolicy = new()
+            {
+                PolicyNumber = policy.Policy,
+                PaymentFolio = policy.Leasing.PaymentFolio,
+                Serial = policy.Leasing.Serial,
+                ReferenceId = policy.Leasing.ReferenceId,
+                Bank = policy.Leasing.Bank,
+                Invoice = policy.Clipert.Invoice,
+                AccountNumber = policy.Leasing.AccountNumber,
+                DocumentDate = policy.Leasing.DocumentDate,
+                DepositAmount = policy.Leasing.DepositAmount,
+                Validated = policy.Validated
+            };
+
+        return mappedPolicy;
+    }
+
+    //mapeamos los comentarios al VM
+    PolicyCommentPost MappedComent(PolicyCommentVM comment)
+    {
+        //mapeamos el comentario que creamos
+        PolicyCommentPost commentPost = new()
+            {
+                Policy = SelectedItem.Policy,
+                Invoice = SelectedItem.Clipert.Invoice,
+                Comment = comment.Comment
+            };
+
+        return commentPost;
+    }
+
+    async Task ValidatePolicyInfo(Boolean value)
+    {
+
+        //Policy policy = new()
+        //    {
+        //        PolicyNumber = SelectedItem.Policy,
+        //        Serial = SelectedItem.Leasing.Serial,
+        //        PaymentFolio = SelectedItem.Leasing.PaymentFolio,
+        //        ReferenceId = SelectedItem.Leasing.ReferenceId,
+        //        Bank = SelectedItem.Leasing.Bank,
+        //        Invoice = SelectedItem.Clipert.Invoice,
+        //        AccountNumber = SelectedItem.Leasing.AccountNumber,
+        //        DocumentDate = SelectedItem.Leasing.DocumentDate,
+        //        DepositAmount = SelectedItem.Leasing.DepositAmount,
+        //        Validated = value
+        //    };
         try
         {
 
-            await loadingIndicator.Show();
+            //Lanzamos el spinner
+            await LoadingIndicator.Show();
 
-            var policiesWereUpdated = await Policies.PatchPoliciesAsync(policy);
+            //verificamos si se pudo actualizar correctamente datos de la póliza
+            var policiesWereUpdated = await Service.PatchPoliciesAsync(MappedPolicy(value));
 
             if (policiesWereUpdated)
             {
-                await Policies.LoadPoliciesAsync();
-
-                await loadingIndicator.Hide();
+                //if success
+                await Service.LoadPoliciesAsync();
+                await LoadingIndicator.Hide();
                 await successSnackBar.Show();
                 StateHasChanged();
             }
             else
             {
-                await loadingIndicator.Hide();
+                //if fails
+                await LoadingIndicator.Hide();
 
                 await errorSnackBar.Show();
             }
@@ -397,36 +462,34 @@
         }
     }
 
+    //Evento que ocurre cuando insertamos el comentarios
     async Task OnCommentRowInserted(SavedRowItem<PolicyCommentVM, Dictionary<String, Object>> e)
     {
+        //capturamos el comentario que hemos escrito
         var comment = e.Item;
 
-        PolicyCommentPost commentPost = new()
-            {
-                Policy = SelectedItem.Policy,
-                Invoice = SelectedItem.Clipert.Invoice,
-                Comment = comment.Comment
-            };
 
         try
         {
-            await loadingIndicator.Show();
-            var commentWerePosted = await Policies.PostCommentAsync(commentPost);
+            //Verificamos si pudimos invocar el método para hacer el post de comentarios
+            await LoadingIndicator.Show();
+            var commentWerePosted = await Service.PostCommentAsync(MappedComent(comment));
 
             if (commentWerePosted)
             {
-                await loadingIndicator.Hide();
-                await Policies.LoadPoliciesAsync();
+                //if success
+                await LoadingIndicator.Hide();
+                await Service.LoadPoliciesAsync();
                 await CloseCommentsModal();
                 await commentSnackBar.Show();
 
                 StateHasChanged();
-                
+
             }
             else
             {
-                await loadingIndicator.Hide();
-
+                ////sino...
+                await LoadingIndicator.Hide();
                 await errorSnackBar.Show();
             }
         }
@@ -436,47 +499,33 @@
         }
     }
 
-
+    //Evento que se lanza al guardar la info de la póliza actualizada
     async Task OnPolicyRowUpdated(SavedRowItem<Data, Dictionary<String, object>> e)
     {
+        //Capturamos la info que acabamos de ingresar
+        var policy = e.Item;
 
-        var policies = e.Item;
-        Policy policy = new()
-            {
-                PolicyNumber = policies.Policy,
-                PaymentFolio = policies.Leasing.PaymentFolio,
-                Serial = policies.Leasing.Serial,
-                ReferenceId = policies.Leasing.ReferenceId,
-                Bank = policies.Leasing.Bank,
-                Invoice = policies.Clipert.Invoice,
-                AccountNumber = policies.Leasing.AccountNumber,
-                DocumentDate = policies.Leasing.DocumentDate,
-                DepositAmount = policies.Leasing.DepositAmount,
-                Validated = policies.Validated
-            };
         try
         {
-            await loadingIndicator.Show();
+            //lanzamos el spinner y validamos si pudimos invocar la tarea para hacer el patch de policies
+            await LoadingIndicator.Show();
+            var policiesWereUpdated = await Service.PatchPoliciesAsync(MappedPolicy(policy));
 
-            var policiesWereUpdated = await Policies.PatchPoliciesAsync(policy);
-
+            //Si success
             if (policiesWereUpdated)
             {
-                await Policies.LoadPoliciesAsync();
+                await Service.LoadPoliciesAsync();
 
-                await loadingIndicator.Hide();
+                await LoadingIndicator.Hide();
                 await successSnackBar.Show();
                 StateHasChanged();
             }
             else
             {
-                await loadingIndicator.Hide();
-
+                //sino
+                await LoadingIndicator.Hide();
                 await errorSnackBar.Show();
             }
-
-
-
         }
         catch (Exception)
         {
@@ -485,22 +534,17 @@
         }
     }
 
+    //Método para mostrar el modal comentarios
     private Task ShowCommentsModal()
     {
-
         return commentsModalRef.Show();
-
     }
 
+    //Evento para ocultar el modal
     private Task CloseCommentsModal()
     {
         return commentsModalRef.Close(CloseReason.None);
     }
 
-    private Task ShowDetailsModal()
-    {
-        //LoadComments(SelectedItem.Policy, SelectedItem.Clipert.Invoice).Wait();
-        return detailsModalRef.Show();
-    }
-}
+  }
 
