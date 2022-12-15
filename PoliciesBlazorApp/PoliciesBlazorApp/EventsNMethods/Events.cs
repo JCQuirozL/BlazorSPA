@@ -28,7 +28,7 @@ namespace PoliciesBlazorApp.EventsNMethods
             TimeSpan term = limitTerm - DateTime.Now;
 
             //hacemos la validación, se valida que sea mayor a cero porque la resta puede ser negativa
-            if (((term.Days < 5) && (term.Days > 0)) && !policy.Validated)
+            if (((term.Days < 5) && (term.Days >= 0)) && !policy.Validated)
             {
                 style.Background = Background.Default;
                 style.Style = "color: #d90707";

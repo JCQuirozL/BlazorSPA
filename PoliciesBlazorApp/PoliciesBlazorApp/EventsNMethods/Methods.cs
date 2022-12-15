@@ -13,7 +13,7 @@ namespace PoliciesBlazorApp.EventsNMethods
             var limitTerm = date.AddDays(Convert.ToDouble(model.Term));
             TimeSpan days = limitTerm - DateTime.Now;
 
-            if (days.Days < 0)
+            if (days.Days < 0 && !model.Validated )
             {
                 return false;
             }

@@ -11,10 +11,13 @@ namespace PoliciesBlazorApp.Services
     public static class Service
     {
         #region Globales
-            public static BillingData PoliciesList = new();
-            static readonly string Url = "/insurance/v1/policies";
-            static string Url2 = "/api/PoliciesCollection";
-            static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
+        public static BillingData PoliciesList = new();
+        static string Url = "/insurance/v1/policies";
+        static string UrlComments = "/notes/v1/leasings/srcINSidd0/comments";
+
+        //static string Url2 = "/api/PoliciesCollection";
+        static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
+        static HttpClient HttpComments = new() { BaseAddress = new Uri("http://localhost:55416") };
         #endregion
 
         //Servicio para cargar info de las pólizas
@@ -39,11 +42,11 @@ namespace PoliciesBlazorApp.Services
         }
 
         //Servicio para hacer el patch de pólizas
-        public static async Task<Boolean> PatchPoliciesAsync(Policy policy)
+        public static async Task<Boolean> PatchPoliciesAsync(PatchPolicies[] policy)
         {
-            PatchPolicies[] model = new[] { new PatchPolicies(policy) };
+            //PatchPolicies[] model = new[] { new PatchPolicies(policy) };
 
-            var json = JsonConvert.SerializeObject(model);
+            var json = JsonConvert.SerializeObject(policy);
             var body = new StringContent(json, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage(HttpMethod.Patch, Url);
@@ -53,21 +56,30 @@ namespace PoliciesBlazorApp.Services
 
             using var httpResponse = await Http.SendAsync(request);
 
-            return httpResponse.IsSuccessStatusCode ? true : false;
+            return httpResponse.IsSuccessStatusCode;
         }
 
         //Servicio para hacer el post de comentarios
-        public static async Task<Boolean> PostCommentAsync(PolicyCommentPost model)
+        public static async Task<Boolean> PostCommentAsync(PolicyComment model)
         {
-            var json = JsonConvert.SerializeObject(model);
-            var body = new StringContent(json, Encoding.UTF8, "application/json");
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var body = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var request = new HttpRequestMessage(HttpMethod.Post, Url);
-            request.Headers.Add("Session-Id", "10000057cpbas096");
-            request.Content = body;
-            using var httpResponse = await Http.SendAsync(request);
+                var request = new HttpRequestMessage(HttpMethod.Post, UrlComments);
+                request.Headers.Add("Session-Id", "10000057cpbas096");
+                request.Content = body;
+                using var httpResponse = await HttpComments.SendAsync(request);
 
-            return httpResponse.IsSuccessStatusCode ? true : false;
+                return httpResponse.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
         }
     }
 }

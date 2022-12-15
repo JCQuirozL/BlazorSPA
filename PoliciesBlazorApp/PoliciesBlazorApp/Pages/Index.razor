@@ -90,7 +90,7 @@
         </PopupTitleTemplate>
         <DataGridColumns>
             <DataGridColumn TItem="Data" Field="@nameof(Data.Policy)" Caption="PÓLIZA" Width="7%" TextAlignment="TextAlignment.Center" />
-            <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="Data" Field="Leasing.Serial" Caption="NO. SERIE" Editable="true" Width="14%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="Data" Field="Leasing.Serial" Caption="NO. SERIE" Width="14%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
                             DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
@@ -143,13 +143,8 @@
                 </CancelCommandTemplate>
                 <EditCommandTemplate>
                     @{
-                        //Validación para checar la vigencia e la póliza
-                        var date = context.Item.Clipert.SendingDateASE;
-                        var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
-                        TimeSpan term = limitTerm - DateTime.Now;
-                        //si aún está dentro del plazo (15,30,60 dás, etc) entonces que aún se muestre el botón de editar
-                        //de lo contrario ya no se podrá validar información de la póliza
-                        if (term.Days > 0)
+                        //Validación para checar la vigencia de la póliza
+                        if (Methods.IsActivePolicy(context.Item))
                         {
                             <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
                                 <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
@@ -157,6 +152,23 @@
                                 </Button>
                             </Tooltip>
                         }
+                        //var date = context.Item.Clipert.SendingDateASE;
+                        //var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
+                        //TimeSpan term = limitTerm - DateTime.Now;
+                        //si aún está dentro del plazo (15,30,60 dás, etc) entonces que aún se muestre el botón de editar
+                        //de lo contrario ya no se podrá validar información de la póliza
+                        //if (term.Days < 0)
+                        //{
+
+                        //}
+                        //else
+                        //{
+                        //    <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
+                        //        <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
+                        //            <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                        //        </Button>
+                        //    </Tooltip>
+                        //}
                     }
                 </EditCommandTemplate>
             </DataGridCommandColumn>
@@ -195,6 +207,7 @@
                     <Field Padding="Padding.Is1">
                         <FieldLabel TextWeight="TextWeight.Bold">Última modificación: </FieldLabel>
                         @{
+                            //Sino hay fecha de modificación entonces escribimos lo siguiente
                             if ((context.UpdateDate) == null)
                             {
                                 <Text> Sin modificación</Text>
@@ -202,6 +215,7 @@
 
                             else
                             {
+                                //Si ya hay fecha en que se haya modificado escribimos la última fecha de modificación
                                 <Text> @context.UpdateDate</Text>
                             }
 
@@ -265,7 +279,7 @@
 
 
 
-    @*-------------------------------------------------------->Snackbar's'<--------------------------------------------*@
+    @*--------------------------------------------------------> Snackbar's <--------------------------------------------*@
     @*el snackbar es un toast*@
     @*success*@
     <Snackbar @ref="@successSnackBar" Color="SnackbarColor.Info">
@@ -288,7 +302,7 @@
     <Snackbar @ref="@errorSnackBar" Color="SnackbarColor.Danger">
         <Div Class="center-snack">
             <SnackbarBody Style="text-align: center; font-size: 15px; font-weight: 600;">
-                No se modificó ningún dato de la póliza @SelectedItem.Policy
+                Ocurrió un error guardando la información de la póliza: @SelectedItem.Policy
                 <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
             </SnackbarBody>
         </Div>
@@ -302,26 +316,26 @@
 
     #region Globales
 
-        //Servicio para mandar un 'sweetalert'
-        [Inject]
-        IMessageService? MessageService { get; set; }
+    //Servicio para mandar un 'sweetalert'
+    [Inject]
+    IMessageService? MessageService { get; set; }
 
-        //Spinner
-        LoadingIndicator LoadingIndicator { get; set; } = new();
+    //Spinner
+    LoadingIndicator LoadingIndicator { get; set; } = new();
 
-        //Toast
-        Snackbar successSnackBar = new();
-        Snackbar errorSnackBar = new();
-        Snackbar commentSnackBar = new();
+    //Toast
+    Snackbar successSnackBar = new();
+    Snackbar errorSnackBar = new();
+    Snackbar commentSnackBar = new();
 
-        //propiedad para saber en que elemento del DGrid estamos
-        public Data SelectedItem = new();
+    //propiedad para saber en que elemento del DGrid estamos
+    public Data SelectedItem = new();
 
-        //propiedad para saber en que elemento del DGrid de comentarios estamos
-        public PolicyCommentVM selectedComment = new();
+    //propiedad para saber en que elemento del DGrid de comentarios estamos
+    public PolicyCommentVM selectedComment = new();
 
-        //Modal que contiene la grilla de comentarios
-        private Modal commentsModalRef = new();
+    //Modal que contiene la grilla de comentarios
+    private Modal commentsModalRef = new();
 
     #endregion
 
@@ -337,7 +351,7 @@
         return ((e.Item.Policy == SelectedItem?.Policy));
     }
 
-    //Evento que se lanza al cambiar al hacer clic en el CheckBox
+    //Evento que se lanza al hacer clic en el CheckBox
     async Task OnCheckedChange(Boolean value)
     {
         //antes de 'validar' la info de las póliza, lanzamos un msg para que el usuario confirme la acción
@@ -358,9 +372,8 @@
     }
 
     //mapeamos los datos de la póliza cuando se valida la info
-    Policy MappedPolicy(Boolean validated)
+    PatchPolicies[] MappedPolicy(Boolean validated)
     {
-
         Policy policy = new()
             {
                 PolicyNumber = SelectedItem.Policy,
@@ -375,11 +388,14 @@
                 Validated = validated
             };
 
-        return policy;
+        PatchPolicies[] model = new[] { new PatchPolicies(policy) };
+
+
+        return model;
     }
-    
+
     //Sobrecarga para mapear la póliza cuadno se edita info
-    Policy MappedPolicy(Data policy)
+    PatchPolicies[] MappedPolicy(Data policy)
     {
         Policy mappedPolicy = new()
             {
@@ -395,39 +411,28 @@
                 Validated = policy.Validated
             };
 
-        return mappedPolicy;
+        PatchPolicies[] model = new[] { new PatchPolicies(mappedPolicy) };
+
+        return model;
     }
 
     //mapeamos los comentarios al VM
-    PolicyCommentPost MappedComent(PolicyCommentVM comment)
+    PolicyComment MappedComent(PolicyCommentVM comment)
     {
         //mapeamos el comentario que creamos
-        PolicyCommentPost commentPost = new()
-            {
-                Policy = SelectedItem.Policy,
-                Invoice = SelectedItem.Clipert.Invoice,
-                Comment = comment.Comment
-            };
+        PolicyComment commentPost = new();
+
+        commentPost.Author.Name = "ejecutivo.bbva@bbva.com";
+        commentPost.Author.Department = "TI";
+        commentPost.Author.Id = SelectedItem.PolicyId;
+        commentPost.Content = comment.Comment;
 
         return commentPost;
     }
 
+    //Evento que se llama cuando se clickea el check de validar póliza
     async Task ValidatePolicyInfo(Boolean value)
     {
-
-        //Policy policy = new()
-        //    {
-        //        PolicyNumber = SelectedItem.Policy,
-        //        Serial = SelectedItem.Leasing.Serial,
-        //        PaymentFolio = SelectedItem.Leasing.PaymentFolio,
-        //        ReferenceId = SelectedItem.Leasing.ReferenceId,
-        //        Bank = SelectedItem.Leasing.Bank,
-        //        Invoice = SelectedItem.Clipert.Invoice,
-        //        AccountNumber = SelectedItem.Leasing.AccountNumber,
-        //        DocumentDate = SelectedItem.Leasing.DocumentDate,
-        //        DepositAmount = SelectedItem.Leasing.DepositAmount,
-        //        Validated = value
-        //    };
         try
         {
 
@@ -447,7 +452,7 @@
             }
             else
             {
-                //if fails
+                //if it fails
                 await LoadingIndicator.Hide();
 
                 await errorSnackBar.Show();
@@ -457,7 +462,9 @@
         }
         catch (Exception ex)
         {
+            await LoadingIndicator.Hide();
 
+            await errorSnackBar.Show();
             throw;
         }
     }
@@ -467,7 +474,6 @@
     {
         //capturamos el comentario que hemos escrito
         var comment = e.Item;
-
 
         try
         {
@@ -493,9 +499,10 @@
                 await errorSnackBar.Show();
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await LoadingIndicator.Hide();
+            await errorSnackBar.Show();
         }
     }
 
@@ -503,13 +510,14 @@
     async Task OnPolicyRowUpdated(SavedRowItem<Data, Dictionary<String, object>> e)
     {
         //Capturamos la info que acabamos de ingresar
-        var policy = e.Item;
+        var selectedPolicy = e.Item;
+
 
         try
         {
             //lanzamos el spinner y validamos si pudimos invocar la tarea para hacer el patch de policies
             await LoadingIndicator.Show();
-            var policiesWereUpdated = await Service.PatchPoliciesAsync(MappedPolicy(policy));
+            var policiesWereUpdated = await Service.PatchPoliciesAsync(MappedPolicy(selectedPolicy));
 
             //Si success
             if (policiesWereUpdated)
@@ -527,9 +535,10 @@
                 await errorSnackBar.Show();
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            await LoadingIndicator.Hide();
+            await errorSnackBar.Show();
             throw;
         }
     }

@@ -2,6 +2,7 @@
 {
     public class Data
     {
+        public int PolicyId { get; set; }
         public String Policy { get; set; }
         public LeasingData Leasing { get; set; }
 

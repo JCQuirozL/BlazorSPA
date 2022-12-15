@@ -25,6 +25,7 @@ namespace APICollection.Entities
         public Byte ConfigId { get; set; }
         public TimeLimitConfiguration Configuration { get; set; } = null!;
 
+        //public int PolicyHeaderId { get; set; }
         public List<PolicyCollectionHistory> PoliciesCollectionHistory { get; set; } = null!;
         public List<PolicyComment> Comments { get; set; } = null!;
     }
