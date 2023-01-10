@@ -253,8 +253,14 @@
                           RowInserted="@OnCommentRowInserted"
                           UseValidation>
                     <DataGridColumns>
-                        <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%" />
+
+                        <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%">
+                            <EditTemplate>
+                                <MemoEdit ReplaceTab Placeholder="Ingresa el comentario aquí" Text="@((string)context.CellValue)" TextChanged="((value)=>context.CellValue = value)" />
+                            </EditTemplate>
+                        </DataGridColumn>
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" TextAlignment="TextAlignment.Center" />
+
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" TextAlignment="TextAlignment.Center" />
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" Displayable="false" TextAlignment="TextAlignment.Center" />
                         <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
@@ -552,7 +558,7 @@
     //Evento para ocultar el modal
     private Task CloseCommentsModal()
     {
-        return commentsModalRef.Close(CloseReason.None);
+        return commentsModalRef.Close(CloseReason.UserClosing);
     }
 
   }

@@ -15,7 +15,9 @@ builder.Services
     .AddBlazorise(options =>
     {
         options.Immediate = true;
-        
+        options.Debounce = true;
+        //options.Immediate = false;
+
     })
     .AddMaterialProviders().AddBootstrapProviders().AddFontAwesomeIcons()
     .AddMaterialIcons();

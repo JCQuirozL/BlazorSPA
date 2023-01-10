@@ -67,6 +67,7 @@ body {
     letter-spacing: .0178571429em !important;
     line-height: 1.25rem !important;
     font-family: bentonsansbbva-book !important;
+    padding: .5rem;
 }
 
 
@@ -205,6 +206,11 @@ a, a:hover {
 
 .modal-footer {
     justify-content: center;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.modal-body {
+    padding: 1.25rem 1.5rem !important;
 }
 
 .btn {
@@ -296,6 +302,7 @@ div::selection, h1::selection, h2::selection, h3::selection, h4::selection, h5::
 
 th {
     text-align: center !important;
+    
 }
 
 .table-responsive {
@@ -306,3 +313,8 @@ th {
 #btnSave {
     margin-right: .25rem;
 }
+
+.row{
+    margin-left: -11px;
+}
+

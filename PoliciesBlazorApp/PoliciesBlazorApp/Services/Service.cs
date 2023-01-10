@@ -12,7 +12,7 @@ namespace PoliciesBlazorApp.Services
     {
         #region Globales
         public static BillingData PoliciesList = new();
-        static string Url = "/insurance/v1/policies";
+        static string Url = "/insurances/v1/policies";
         static string UrlComments = "/notes/v1/leasings/srcINSidd0/comments";
 
         //static string Url2 = "/api/PoliciesCollection";
