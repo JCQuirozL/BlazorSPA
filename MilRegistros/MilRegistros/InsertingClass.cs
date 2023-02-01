@@ -14,9 +14,7 @@ namespace MilRegistros
             {
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandType = System.Data.CommandType.Text;
-                //cmd.CommandText = "INSERT INTO PoliciesCollection SELECT PCF.PolicyFileId, PIS.PolicyInfoId,1, PIS.Policy,PIS.Serial, PCF.TotalPremium,PIS.PaymentFolio,PIS.Bank,PIS.AccountNumber,PIS.DepositAmount,PIS.DepositDate, PIS.ReferenceId, PCF.Certificate,PCF.Invoice,PCF.IssueDate, PCF.EmmiterCenter, 0,null,GETDATE(),null FROM PolicyCollectionFile PCF INNER JOIN PolicyInformationService PIS ON PCF.Policy = PIS.Policy WHERE PCF.Policy = '8A2S650010'";
                 String policyValue = "8A2S65000";
-
 
                 cmd.Connection = cnx;
 

@@ -150,6 +150,7 @@ body {
 
 .table {
     --bs-table-hover-bg: #d7d9dd !important;
+    width: 100%;
 }
 
 strong {
@@ -302,7 +303,6 @@ div::selection, h1::selection, h2::selection, h3::selection, h4::selection, h5::
 
 th {
     text-align: center !important;
-    
 }
 
 .table-responsive {
@@ -314,7 +314,7 @@ th {
     margin-right: .25rem;
 }
 
-.row{
-    margin-left: -11px;
+.row {
+    
+    max-width: 101%;
 }
-

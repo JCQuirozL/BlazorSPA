@@ -12,16 +12,19 @@ namespace PoliciesBlazorApp.Services
     {
         #region Globales
         public static BillingData PoliciesList = new();
-        static string Url = "/insurances/v1/policies";
-        static string UrlComments = "/notes/v1/leasings/srcINSidd0/comments";
+        static string Url = "/insurances/insurances/v1/policies";
+        static string UrlComments = "/common/notes/v1/leasings/srcINSidd0/comments";
 
         //static string Url2 = "/api/PoliciesCollection";
-        static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
-        static HttpClient HttpComments = new() { BaseAddress = new Uri("http://localhost:55416") };
+        //static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
+        static HttpClient Http = new() { BaseAddress = new Uri(@"https://lsnga1mxc.facileasing.com.mx") };
+        
+
+        static HttpClient HttpComments = new() { BaseAddress = new Uri("http://lsnga1mxc.facileasing.com.mx:8052") };
         #endregion
 
         //Servicio para cargar info de las pólizas
-        public static async Task LoadPoliciesAsync()
+        public static async Task<BillingData> LoadPoliciesAsync()
         {
             try
             {
@@ -31,6 +34,7 @@ namespace PoliciesBlazorApp.Services
 
                 PoliciesList = await httpResponse.Content.ReadFromJsonAsync<BillingData>();
 
+                return PoliciesList;
                 //PoliciesList = await Http.GetFromJsonAsync<List<BillingData>>(Url);
             }
             catch (Exception ex)
@@ -79,7 +83,7 @@ namespace PoliciesBlazorApp.Services
 
                 throw;
             }
-            
+
         }
     }
 }

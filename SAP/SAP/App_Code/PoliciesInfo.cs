@@ -29,7 +29,7 @@ public class PoliciesInfo
         Bank = String.Empty;
         AccountNumber = String.Empty;
         DocumentDate = DateTime.Now;
-        DepositAmount = Decimal.Zero;
+           DepositAmount = Decimal.Zero;
         ReferenceId = String.Empty;
         Economic = String.Empty;
         DocumentNumber = String.Empty;

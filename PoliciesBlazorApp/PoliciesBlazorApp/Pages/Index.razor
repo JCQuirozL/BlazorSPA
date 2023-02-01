@@ -63,7 +63,9 @@
         </Div>
     </Div>
 
+
     @*---------------------------------------------------------------Grid-----------------------------------------------------------*@
+    @*<LoadingIndicator @ref=PoliciesLoadingIndicator FullScreen SpinnerColor="Color.Secondary">*@
     <DataGrid TItem="Data"
               Data="@Service.PoliciesList.Data"
               @bind-SelectedRow="@SelectedItem"
@@ -131,6 +133,8 @@
                     </Tooltip>
                 </DisplayTemplate>
             </DataGridColumn>
+            
+            
             <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
                 <SaveCommandTemplate>
                     <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
@@ -226,6 +230,7 @@
             @*</div>*@
         </DetailRowTemplate>
     </DataGrid>
+    @*</LoadingIndicator>*@
 
 
     @*--------------------------------------------------------->modal comments<----------------------------------------------*@
@@ -329,6 +334,7 @@
     //Spinner
     LoadingIndicator LoadingIndicator { get; set; } = new();
 
+
     //Toast
     Snackbar successSnackBar = new();
     Snackbar errorSnackBar = new();
@@ -345,8 +351,13 @@
 
     #endregion
 
+
+
     //Evento que se lanza cuándo se carga la pag
     protected override async Task OnInitializedAsync() => await Service.LoadPoliciesAsync();
+
+
+
 
     //Evento para mostrar el detalle de cada row
     public Boolean OnDetailRowShow(DetailRowTriggerEventArgs<Data> e)
