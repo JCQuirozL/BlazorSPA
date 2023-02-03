@@ -150,7 +150,7 @@ namespace PoliciesBlazorApp.EventsNMethods
 
             if (validationArgs.Status == ValidationStatus.Error)
             {
-                validationArgs.ErrorText = "Comentario no puede ser vacío.";
+                validationArgs.ErrorText = "El comentario no puede quedar vacío.";
             }
         }
     }
