@@ -7,7 +7,7 @@
         public LeasingData Leasing { get; set; }
 
         public ClipertData Clipert { get; set; }
-
+        public int ConfigId { get; set; }
         public int Term { get; set; }
         public Boolean Validated { get; set; }
         public DateTime? UpdateDate { get; set; }

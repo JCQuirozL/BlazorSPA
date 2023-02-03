@@ -9,6 +9,7 @@
 
     public class PolicyComment
     {
+        public int PolicyId { get; set; }
         public Author Author { get; set; } = new Author();
         public String Content { get; set; }
     }

@@ -144,7 +144,15 @@ namespace PoliciesBlazorApp.EventsNMethods
         }
 
 
+        public static void CheckComment(ValidatorEventArgs validationArgs)
+        {
+            ValidationRule.IsNotEmpty(validationArgs);
 
+            if (validationArgs.Status == ValidationStatus.Error)
+            {
+                validationArgs.ErrorText = "Comentario no puede ser vacío.";
+            }
+        }
     }
 }
 

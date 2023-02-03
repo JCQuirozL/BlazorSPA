@@ -15,12 +15,13 @@
 
         public String AccountNumber { get; set; }
 
-        public DateTime DocumentDate { get; set; }
+        public DateTime? DocumentDate { get; set; }
 
-        public Decimal DepositAmount { get; set; }
+        public Decimal? DepositAmount { get; set; }
 
         public Boolean Validated { get; set; }
 
+        public int ConfigId { get; set; }
 
     }
 }

@@ -84,7 +84,7 @@
               UseInternalEditing=true
               DetailRowTrigger="@OnDetailRowShow"
               SelectedRowStyling="@Events.OnSelectedRowStyling"
-              RowStyling="@Events.OnRowStyling" Style="margin-bottom: 0 !important;" UseValidation>
+              RowStyling="@Events.OnRowStyling" Style="margin-bottom: 0 !important;" UseValidation=true>
         <PopupTitleTemplate>
             <ModalTitle>
                 Editar póliza
@@ -133,8 +133,8 @@
                     </Tooltip>
                 </DisplayTemplate>
             </DataGridColumn>
-            
-            
+
+
             <DataGridCommandColumn NewCommandAllowed="false" DeleteCommandAllowed="false">
                 <SaveCommandTemplate>
                     <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary"
@@ -256,12 +256,14 @@
                           SelectedRowStyling="@Events.OnSelectedRowStylingComments"
                           RowStyling="@Events.OnRowStylingComments"
                           RowInserted="@OnCommentRowInserted"
-                          UseValidation>
+                          UseValidation=true>
                     <DataGridColumns>
 
                         <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%">
                             <EditTemplate>
-                                <MemoEdit ReplaceTab Placeholder="Ingresa el comentario aquí" Text="@((string)context.CellValue)" TextChanged="((value)=>context.CellValue = value)" />
+                                <Validation Validator="Events.CheckComment">
+                                    <MemoEdit ReplaceTab Placeholder="Ingresa el comentario aquí" Text="@((string)context.CellValue)" TextChanged="((value)=>context.CellValue = value)" />
+                                </Validation>
                             </EditTemplate>
                         </DataGridColumn>
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" TextAlignment="TextAlignment.Center" />
@@ -311,9 +313,9 @@
     </Snackbar>
     @*error*@
     <Snackbar @ref="@errorSnackBar" Color="SnackbarColor.Danger">
-        <Div Class="center-snack">
+        <Div Class="breakin-word center-snack">
             <SnackbarBody Style="text-align: center; font-size: 15px; font-weight: 600;">
-                Ocurrió un error guardando la información de la póliza: @SelectedItem.Policy
+                No se guardaron datos de la póliza
                 <SnackbarAction Clicked="@(()=>errorSnackBar.Hide())"></SnackbarAction>
             </SnackbarBody>
         </Div>
@@ -402,6 +404,7 @@
                 AccountNumber = SelectedItem.Leasing.AccountNumber,
                 DocumentDate = SelectedItem.Leasing.DocumentDate,
                 DepositAmount = SelectedItem.Leasing.DepositAmount,
+                ConfigId = SelectedItem.ConfigId,
                 Validated = validated
             };
 
@@ -411,7 +414,7 @@
         return model;
     }
 
-    //Sobrecarga para mapear la póliza cuadno se edita info
+    //Sobrecarga para mapear la póliza cuando se edita info
     PatchPolicies[] MappedPolicy(Data policy)
     {
         Policy mappedPolicy = new()
@@ -425,7 +428,8 @@
                 AccountNumber = policy.Leasing.AccountNumber,
                 DocumentDate = policy.Leasing.DocumentDate,
                 DepositAmount = policy.Leasing.DepositAmount,
-                Validated = policy.Validated
+                Validated = policy.Validated,
+                ConfigId = policy.ConfigId
             };
 
         PatchPolicies[] model = new[] { new PatchPolicies(mappedPolicy) };
@@ -441,7 +445,7 @@
 
         commentPost.Author.Name = "ejecutivo.bbva@bbva.com";
         commentPost.Author.Department = "TI";
-        commentPost.Author.Id = SelectedItem.PolicyId;
+        commentPost.PolicyId = SelectedItem.PolicyId;
         commentPost.Content = comment.Comment;
 
         return commentPost;

@@ -12,15 +12,23 @@ namespace PoliciesBlazorApp.Services
     {
         #region Globales
         public static BillingData PoliciesList = new();
+
+        //QA
         static string Url = "/insurances/insurances/v1/policies";
-        static string UrlComments = "/common/notes/v1/leasings/srcINSidd0/comments";
+
+        //Dev
+        //static string Url = "/insurances/v1/policies";
 
         //static string Url2 = "/api/PoliciesCollection";
         //static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
         static HttpClient Http = new() { BaseAddress = new Uri(@"https://lsnga1mxc.facileasing.com.mx") };
-        
 
+        //QA
         static HttpClient HttpComments = new() { BaseAddress = new Uri("http://lsnga1mxc.facileasing.com.mx:8052") };
+
+        //Dev
+        //static HttpClient HttpComments = new() { BaseAddress = new Uri("http://localhost:55416") };
+
         #endregion
 
         //Servicio para cargar info de las pólizas
@@ -71,7 +79,12 @@ namespace PoliciesBlazorApp.Services
                 var json = JsonConvert.SerializeObject(model);
                 var body = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var request = new HttpRequestMessage(HttpMethod.Post, UrlComments);
+                //QA
+                var request = new HttpRequestMessage(HttpMethod.Post, $"/common/notes/v1/leasings/srcINSidd{model.PolicyId}/comments");
+
+                //dev
+                //var request = new HttpRequestMessage(HttpMethod.Post, $"/notes/v1/leasings/srcINSidd{model.PolicyId}/comments");
+
                 request.Headers.Add("Session-Id", "10000057cpbas096");
                 request.Content = body;
                 using var httpResponse = await HttpComments.SendAsync(request);
