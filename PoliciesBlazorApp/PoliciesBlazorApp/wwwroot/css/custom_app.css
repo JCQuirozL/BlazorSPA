@@ -194,7 +194,8 @@ a, a:hover {
     justify-content: center !important;
 }
 
-.form-control:not(textarea) {
+select,.form-control:not(textarea) {
+    font-size: 14px !important;
     height: 40px;
     background-color: #F4F4F4 !important;
     padding-left: .5rem;
@@ -317,4 +318,8 @@ th {
 .row {
     
     max-width: 101%;
+}
+
+input, select{
+    text-transform: uppercase !important;
 }

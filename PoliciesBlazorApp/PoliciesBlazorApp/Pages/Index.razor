@@ -96,7 +96,7 @@
             <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
                             DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
-            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="14%" TextAlignment="TextAlignment.Center" />
+            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="14%" TextAlignment="TextAlignment.Center"/>
             <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" DisplayFormat="{0:dd/MM/yyyy}" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
@@ -209,18 +209,18 @@
                 <Div Class="col-1"></Div>
                 <Div Class="col-3">
                     <Field Padding="Padding.Is1">
-                        <FieldLabel TextWeight="TextWeight.Bold">Última modificación: </FieldLabel>
+                        <FieldLabel Padding="Padding.Is1" TextWeight="TextWeight.Bold">Última modificación:</FieldLabel>
                         @{
                             //Sino hay fecha de modificación entonces escribimos lo siguiente
                             if ((context.UpdateDate) == null)
                             {
-                                <Text> Sin modificación</Text>
+                                <Text>Sin modificación</Text>
                             }
 
                             else
                             {
                                 //Si ya hay fecha en que se haya modificado escribimos la última fecha de modificación
-                                <Text> @context.UpdateDate</Text>
+                                <Text>@context.UpdateDate</Text>
                             }
 
                         }
@@ -298,7 +298,7 @@
     <Snackbar @ref="@successSnackBar" Color="SnackbarColor.Info">
         <Div Class="center-snack">
             <SnackbarBody Style="font-size: 15px; font-weight: 600;">
-                Póliza @SelectedItem.Policy validada correctamente
+                Datos guardados correctamente
                 <SnackbarAction Clicked="@(()=>successSnackBar.Hide())"></SnackbarAction>
             </SnackbarBody>
         </Div>
