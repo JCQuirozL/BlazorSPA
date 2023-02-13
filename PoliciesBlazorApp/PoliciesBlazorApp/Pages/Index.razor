@@ -2,6 +2,7 @@
 @using PoliciesBlazorApp.Models
 @using PoliciesBlazorApp.EventsNMethods
 @using PoliciesBlazorApp.Services
+@using System.Globalization
 
 <PageTitle>Pólizas</PageTitle>
 
@@ -96,7 +97,7 @@
             <DataGridColumn TItem="Data" Field="Clipert.TotalPremium" Caption="PRIMA TOTAL" DisplayFormat="{0:C2}"
                             DisplayFormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US",false).NumberFormat" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.PaymentFolio" Caption="FOLIO PAGO" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
-            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="14%" TextAlignment="TextAlignment.Center"/>
+            <DataGridColumn TItem="Data" Field="Leasing.Bank" Caption="BANCO" Editable="true" Width="14%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.AccountNumber" Caption="CUENTA" Editable="true" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.DocumentDate" Caption="FECHA DEPÓSITO" Editable="true" DisplayFormat="{0:dd/MM/yyyy}" Width="7%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Leasing.DepositAmount" Caption="IMPORTE" Editable="true" DisplayFormat="{0:C}"
@@ -210,7 +211,7 @@
                 <Div Class="col-3">
                     <Field Padding="Padding.Is1">
                         <FieldLabel Padding="Padding.Is1" TextWeight="TextWeight.Bold">Última modificación:</FieldLabel>
-                        @{
+                      @{
                             //Sino hay fecha de modificación entonces escribimos lo siguiente
                             if ((context.UpdateDate) == null)
                             {
@@ -220,7 +221,7 @@
                             else
                             {
                                 //Si ya hay fecha en que se haya modificado escribimos la última fecha de modificación
-                                <Text>@context.UpdateDate</Text>
+                                <Text>@Convert.ToDateTime(context.UpdateDate).ToString("dd/MM/yyyy HH:mm:ss",CultureInfo.CurrentCulture)</Text>
                             }
 
                         }

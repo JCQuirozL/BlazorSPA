@@ -194,7 +194,7 @@ a, a:hover {
     justify-content: center !important;
 }
 
-select,.form-control:not(textarea) {
+.form-control:not(textarea) {
     font-size: 14px !important;
     height: 40px;
     background-color: #F4F4F4 !important;
@@ -322,4 +322,9 @@ th {
 
 input, select{
     text-transform: uppercase !important;
+}
+
+select{
+    font-size: 14px !important;
+    
 }

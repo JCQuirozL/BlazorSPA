@@ -1,4 +1,6 @@
-﻿namespace PoliciesBlazorApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PoliciesBlazorApp.Models
 {
     public class Data
     {
@@ -10,6 +12,9 @@
         public int ConfigId { get; set; }
         public int Term { get; set; }
         public Boolean Validated { get; set; }
+
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime? UpdateDate { get; set; }
         public List<PolicyCommentVM> Comments { get; set; }
     }
