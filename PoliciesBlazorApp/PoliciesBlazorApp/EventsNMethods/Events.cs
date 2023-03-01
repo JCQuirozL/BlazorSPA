@@ -97,6 +97,9 @@ namespace PoliciesBlazorApp.EventsNMethods
 
 
             //Policy and validation
+            //ALL
+            
+
             if (ValidatedFilter == 1 && PolicyFilter != null)
 
                 return model.Policy.Contains(PolicyFilter, StringComparison.OrdinalIgnoreCase) &&
@@ -115,12 +118,12 @@ namespace PoliciesBlazorApp.EventsNMethods
 
             //Date
             if ((StartDateFilter != null) && (EndDateFilter != null) && (ValidatedFilter == 0))
-                return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter) && Methods.IsActivePolicy(model) == true;
+                return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter) == true;
 
 
             //Policy number
             if (PolicyFilter != null && ValidatedFilter == 0)
-                return model.Policy.Contains(PolicyFilter, StringComparison.OrdinalIgnoreCase) && Methods.IsActivePolicy(model);
+                return model.Policy.Contains(PolicyFilter, StringComparison.OrdinalIgnoreCase);
 
 
             //validation status
@@ -133,14 +136,17 @@ namespace PoliciesBlazorApp.EventsNMethods
 
 
             if (ValidatedFilter == 0)
-                return (Methods.IsActivePolicy(model)) == true;
+                //return (Methods.IsActivePolicy(model)) == true;
+            return  true;
+
 
 
             if (ValidatedFilter == 3)
                 return (!Methods.IsActivePolicy(model)) == true;
 
+            return true;
 
-            return (Methods.IsActivePolicy(model)) == true;
+            //return (Methods.IsActivePolicy(model)) == true;
         }
 
 

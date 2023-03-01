@@ -3,6 +3,7 @@
 @using PoliciesBlazorApp.EventsNMethods
 @using PoliciesBlazorApp.Services
 @using System.Globalization
+@inject IJSRuntime JsRuntime
 
 <PageTitle>Pólizas</PageTitle>
 
@@ -15,11 +16,13 @@
         <Div Style="padding:2rem;" class="col-10">
             <Div Class="row">
                 <Div class="col-3">
-                    <TextEdit Class="col-12 background"
-                              Placeholder="Número de póliza"
-                              Color="Colores.AzulBBVA"
-                              @bind-Text="@Events.PolicyFilter">
-                    </TextEdit>
+                    <FocusTrap Active>
+                        <TextEdit Autofocus Class="col-12 background"
+                                  Placeholder="Número de póliza"
+                                  Color="Colores.AzulBBVA"
+                                  @bind-Text="@Events.PolicyFilter">
+                        </TextEdit>
+                    </FocusTrap>
                 </Div>
                 <Div Class="col-7">
                     <Div Class="row">
@@ -27,30 +30,41 @@
                             <Label Style="font-size: 1rem;">De:</Label>
                         </Div>
                         <Div Class="col-5">
-                            <DatePicker Class="col-12 background"
-                                        Placeholder="Fecha emisión inicio" @bind-Date="@Events.StartDateFilter">
-                            </DatePicker>
+                            <Field>
+                                <Tooltip Background="Background.Light" Fade Text="Formato DD/MM/YYYY">
+                                    <DatePicker DisplayFormat="dd/MM/yyyy" Class="col-12 background"
+                                                Placeholder="Fecha emisión inicio" @bind-Date="@Events.StartDateFilter">
+                                    </DatePicker>
+                                </Tooltip>
+                                @*<FieldHelp Style="font-weight: bold;">DD/MM/YYYY</FieldHelp>*@
+                            </Field>
                         </Div>
                         <Div Class="col-1 from-to">
                             <Label Style="font-size: 1rem;">A:</Label>
                         </Div>
                         <Div Class="col-5">
-                            <DatePicker Class="col-12 background"
-                                        Placeholder="Fecha emisión fin" @bind-Date="@Events.EndDateFilter">
-                            </DatePicker>
+                            <Tooltip Fade Text="Formato DD/MM/YYYY">
+                                <DatePicker Class="col-12 background"
+                                            Placeholder="Fecha emisión fin" @bind-Date="@Events.EndDateFilter">
+                                </DatePicker>
+                            </Tooltip>
                         </Div>
                     </Div>
 
                 </Div>
 
                 <Div Class="col-2">
-                    <Select Class="col-12 background" TValue="int" @bind-SelectedValue="@Events.ValidatedFilter">
-                        <SelectItem TValue="int" Value=1>Validada</SelectItem>
-                        <SelectItem TValue="int" Value=2>Por validar</SelectItem>
-                        <SelectItem TValue="int" Value=0>Todas</SelectItem>
-                        <SelectItem TValue="int" Value=3>Vencidas</SelectItem>
-                    </Select>
-
+                    <Field>
+                        <Tooltip Fade Text="Estatus de la póliza">
+                            <Select Class="col-12 background" TValue="int" @bind-SelectedValue="@Events.ValidatedFilter">
+                                <SelectItem TValue="int" Value=1>Validada</SelectItem>
+                                <SelectItem TValue="int" Value=2>Por validar</SelectItem>
+                                <SelectItem TValue="int" Value=0>Todas</SelectItem>
+                                <SelectItem TValue="int" Value=3>Vencidas</SelectItem>
+                            </Select>
+                        </Tooltip>
+                        @* <FieldHelp Style="font-weight: bold;">Estatus de la póliza</FieldHelp>*@
+                    </Field>
                 </Div>
             </Div>
         </Div>
@@ -73,11 +87,11 @@
               Sortable="false"
               Editable
               ShowPager
+              Select
               PageSize=5
               Responsive="true"
               EditMode="DataGridEditMode.Popup"
               FixedHeader="true"
-              Resizable
               Hoverable
               CommandMode="DataGridCommandMode.Commands"
               CustomFilter="@Events.OnCustomFilter"
@@ -88,7 +102,7 @@
               RowStyling="@Events.OnRowStyling" Style="margin-bottom: 0 !important;" UseValidation=true>
         <PopupTitleTemplate>
             <ModalTitle>
-                Editar póliza
+                Editar póliza @SelectedItem.Policy
             </ModalTitle>
         </PopupTitleTemplate>
         <DataGridColumns>
@@ -105,18 +119,24 @@
             <DataGridColumn TItem="Data" Field="Leasing.ReferenceId" Caption="REFERENCIA" Editable="true" Width="5%" TextAlignment="TextAlignment.Center" />
             <DataGridColumn TItem="Data" Field="Clipert.SendingDateASE" Caption="FECHA EMISIÓN" DisplayFormat="{0:dd/MM/yyyy}" Width="7%" TextAlignment="TextAlignment.Center" />
 
-            <DataGridCheckColumn TItem="Data" Field="@nameof(Data.Validated)" Caption="VALIDADA" Width="5%">
+            <DataGridCheckColumn Displayable="((Events.ValidatedFilter == 0) || (Events.ValidatedFilter == 2))" TItem="Data" Field="@nameof(Data.Validated)" Caption="ESTATUS" Width="5%">
                 <DisplayTemplate>
                     <Div Class="centered">
                         @{
+
                             var date = context.Clipert.SendingDateASE;
                             var limitTerm = date.AddDays(Convert.ToDouble(context.Term));
                             TimeSpan term = limitTerm - DateTime.Now;
 
                             if (term.Days < 0)
                             {
-                                <Check TValue="Boolean" Disabled
-                               Background="Background.Secondary" />
+                                <Text>VENCIDA</Text>
+                                // <Check TValue="Boolean" Disabled
+                                //Background="Background.Secondary" />
+                            }
+                            else if (context.Validated)
+                            {
+                                <Text>VALIDADA</Text>
                             }
                             else
                             {
@@ -129,7 +149,7 @@
             </DataGridCheckColumn>
             <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Width="5%">
                 <DisplayTemplate>
-                    <Tooltip Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
+                    <Tooltip Fade Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
                         <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
                     </Tooltip>
                 </DisplayTemplate>
@@ -157,23 +177,7 @@
                                 </Button>
                             </Tooltip>
                         }
-                        //var date = context.Item.Clipert.SendingDateASE;
-                        //var limitTerm = date.AddDays(Convert.ToDouble(context.Item.Term));
-                        //TimeSpan term = limitTerm - DateTime.Now;
-                        //si aún está dentro del plazo (15,30,60 dás, etc) entonces que aún se muestre el botón de editar
-                        //de lo contrario ya no se podrá validar información de la póliza
-                        //if (term.Days < 0)
-                        //{
 
-                        //}
-                        //else
-                        //{
-                        //    <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
-                        //        <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
-                        //            <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
-                        //        </Button>
-                        //    </Tooltip>
-                        //}
                     }
                 </EditCommandTemplate>
             </DataGridCommandColumn>
@@ -211,7 +215,7 @@
                 <Div Class="col-3">
                     <Field Padding="Padding.Is1">
                         <FieldLabel Padding="Padding.Is1" TextWeight="TextWeight.Bold">Última modificación:</FieldLabel>
-                      @{
+                        @{
                             //Sino hay fecha de modificación entonces escribimos lo siguiente
                             if ((context.UpdateDate) == null)
                             {
@@ -263,13 +267,15 @@
                         <DataGridColumn CellClass="@((item)=>"breakin-word")" TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.Comment)" Caption="Comentario" Editable Width="35%">
                             <EditTemplate>
                                 <Validation Validator="Events.CheckComment">
-                                    <MemoEdit ReplaceTab Placeholder="Ingresa el comentario aquí" Text="@((string)context.CellValue)" TextChanged="((value)=>context.CellValue = value)" />
+                                    <FocusTrap Active>
+                                        <MemoEdit Autofocus ReplaceTab Placeholder="Ingresa el comentario aquí" Text="@((string)context.CellValue)" TextChanged="((value)=>context.CellValue = value)" />
+                                    </FocusTrap>
                                 </Validation>
                             </EditTemplate>
                         </DataGridColumn>
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.User)" Caption="Usuario" TextAlignment="TextAlignment.Center" />
 
-                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" TextAlignment="TextAlignment.Center" />
+                        <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentDate)" Caption="Fecha" TextAlignment="TextAlignment.Center" DisplayFormat="{0:dd/MM/yyyy}" />
                         <DataGridColumn TItem="PolicyCommentVM" Field="@nameof(PolicyCommentVM.CommentType)" Caption="Tipo" Displayable="false" TextAlignment="TextAlignment.Center" />
                         <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
                             <SaveCommandTemplate>
@@ -325,10 +331,13 @@
 
 
 
+
+
 @*CODEBEHIND*@
 @code {
 
     #region Globales
+    private ErrorBoundary? errorBoundary;
 
     //Servicio para mandar un 'sweetalert'
     [Inject]
@@ -343,7 +352,7 @@
     Snackbar errorSnackBar = new();
     Snackbar commentSnackBar = new();
 
-    //propiedad para saber en que elemento del DGrid estamos
+    //propiedad para saber en que elemento del DGrid estamos seleccionando
     public Data SelectedItem = new();
 
     //propiedad para saber en que elemento del DGrid de comentarios estamos
@@ -356,8 +365,26 @@
 
 
 
+
     //Evento que se lanza cuándo se carga la pag
-    protected override async Task OnInitializedAsync() => await Service.LoadPoliciesAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await Service.LoadPoliciesAsync();
+
+
+        }
+        catch (Exception ex)
+        {
+            await MessageService.Error(ex.Message, "Error", opt =>
+            {
+                opt.OkButtonText = "Aceptar"; opt.ShowMessageIcon = true;
+                opt.MessageIcon = IconName.ExclamationCircle;
+            });
+        }
+
+    }
 
 
 
@@ -368,6 +395,7 @@
         //con ésta propiedad indicamos que el detalle se cerrará al dar clic en la misma fila o en una diferente,
         //sólo un detalle abierto a la vez
         e.Single = true;
+
         return ((e.Item.Policy == SelectedItem?.Policy));
     }
 
@@ -384,8 +412,7 @@
         }
         catch (Exception ex)
         {
-
-            throw;
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
         }
 
 
@@ -487,7 +514,8 @@
             await LoadingIndicator.Hide();
 
             await errorSnackBar.Show();
-            throw;
+
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 
@@ -525,6 +553,8 @@
         {
             await LoadingIndicator.Hide();
             await errorSnackBar.Show();
+            await MessageService.Error(ex.Message, "Error", opt => { opt.OkButtonText = "Aceptar"; opt.ShowMessageIcon = true; opt.MessageIcon = IconName.ExclamationCircle; });
+            //await JsRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 
@@ -561,7 +591,7 @@
         {
             await LoadingIndicator.Hide();
             await errorSnackBar.Show();
-            throw;
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
         }
     }
 

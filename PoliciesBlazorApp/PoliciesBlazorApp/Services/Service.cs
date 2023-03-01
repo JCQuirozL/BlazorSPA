@@ -19,14 +19,17 @@ namespace PoliciesBlazorApp.Services
         //Dev
         //static string Url = "/insurances/v1/policies";
 
-        //static string Url2 = "/api/PoliciesCollection";
+
+        //dev Policies Url
         //static HttpClient Http = new() { BaseAddress = new Uri("https://localhost:44391") };
+
+        //QA policies Url
         static HttpClient Http = new() { BaseAddress = new Uri(@"https://lsnga1mxc.facileasing.com.mx") };
 
-        //QA
+        //QA Url comments
         static HttpClient HttpComments = new() { BaseAddress = new Uri("http://lsnga1mxc.facileasing.com.mx:8052") };
 
-        //Dev
+        //Dev Url comments
         //static HttpClient HttpComments = new() { BaseAddress = new Uri("http://localhost:55416") };
 
         #endregion
@@ -48,7 +51,7 @@ namespace PoliciesBlazorApp.Services
             catch (Exception ex)
             {
 
-                throw;
+                throw new InvalidOperationException(ex.Message);
             }
 
         }

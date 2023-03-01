@@ -1,0 +1,19 @@
+﻿
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+        <Index />
+    </ChildContent>
+    <ErrorContent>
+        <p class="error-message">Uh oh! Something went wrong</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+
+
+@code {
+     private ErrorBoundary? errorBoundary;
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+}
