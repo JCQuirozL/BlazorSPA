@@ -335,3 +335,11 @@ select {
     border-radius: 5px;
     display: inline-block;
 }
+
+.icons-color {
+    color: var(--darkBlueBBVA);
+}
+
+.text-info {
+    color: var(--darkBlueBBVA) !important;
+}

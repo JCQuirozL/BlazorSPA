@@ -23,8 +23,10 @@ builder.Services
         //options.Immediate = false;
 
     })
-    .AddMaterialProviders().AddBootstrapProviders().AddFontAwesomeIcons()
-    .AddMaterialIcons();
+    .AddMaterialProviders()
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
+    //.AddMaterialIcons();
 
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

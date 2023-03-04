@@ -150,7 +150,9 @@
             <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Data" Width="5%">
                 <DisplayTemplate>
                     <Tooltip Fade Text="Mostrar/Añadir comentarios" Placement="TooltipPlacement.Top">
-                        <Icon Name="IconName.Comments" IconStyle="IconStyle.DuoTone" IconSize="IconSize.x10" Clicked="@ShowCommentsModal"></Icon>
+                        <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="@ShowCommentsModal">
+                            <Icon Name="@("fas fa-comment-alt")" IconStyle="IconStyle.DuoTone" IconSize="IconSize.Large" Class="icons-color"></Icon>
+                        </Button>
                     </Tooltip>
                 </DisplayTemplate>
             </DataGridColumn>
@@ -172,8 +174,8 @@
                         if (Methods.IsActivePolicy(context.Item))
                         {
                             <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
-                                <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
-                                    <Icon Name="IconName.Edit" IconStyle="IconStyle.DuoTone" IconSize="IconSize.ExtraSmall"></Icon>
+                                <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked"  Disabled="context.Item.Validated">
+                                    <Icon Name="@("fas fa-edit")" IconStyle="IconStyle.DuoTone" IconSize="IconSize.Large" Class="icons-color"></Icon>
                                 </Button>
                             </Tooltip>
                         }
@@ -395,7 +397,6 @@
         //con ésta propiedad indicamos que el detalle se cerrará al dar clic en la misma fila o en una diferente,
         //sólo un detalle abierto a la vez
         e.Single = true;
-
         return ((e.Item.Policy == SelectedItem?.Policy));
     }
 
