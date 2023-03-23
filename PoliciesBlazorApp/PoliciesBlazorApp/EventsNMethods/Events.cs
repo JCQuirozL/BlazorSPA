@@ -120,6 +120,14 @@ namespace PoliciesBlazorApp.EventsNMethods
             if ((StartDateFilter != null) && (EndDateFilter != null) && (ValidatedFilter == 0))
                 return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter) == true;
 
+            if ((StartDateFilter != null) && (EndDateFilter != null) && (ValidatedFilter == 1))
+                return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter && model.Validated) == true;
+
+            if ((StartDateFilter != null) && (EndDateFilter != null) && (ValidatedFilter == 2))
+                return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter && !model.Validated) == true;
+
+            if ((StartDateFilter != null) && (EndDateFilter != null) && (ValidatedFilter == 3))
+                return (model.Clipert.SendingDateASE >= StartDateFilter && model.Clipert.SendingDateASE <= EndDateFilter) && !Methods.IsActivePolicy(model) == true;
 
             //Policy number
             if (PolicyFilter != null && ValidatedFilter == 0)

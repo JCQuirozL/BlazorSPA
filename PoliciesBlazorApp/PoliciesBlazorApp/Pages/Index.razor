@@ -44,7 +44,7 @@
                         </Div>
                         <Div Class="col-5">
                             <Tooltip Fade Text="Formato DD/MM/YYYY">
-                                <DatePicker Class="col-12 background"
+                                <DatePicker DisplayFormat="dd/MM/yyyy" Class="col-12 background"
                                             Placeholder="Fecha emisión fin" @bind-Date="@Events.EndDateFilter">
                                 </DatePicker>
                             </Tooltip>
@@ -136,7 +136,8 @@
                             }
                             else if (context.Validated)
                             {
-                                <Text>VALIDADA</Text>
+                                <Icon Name="@("fas fa-check-circle")" IconSize="IconSize.Large" Class="icons-color"></Icon>
+                                //<Text>VALIDADA</Text>
                             }
                             else
                             {
@@ -174,7 +175,7 @@
                         if (Methods.IsActivePolicy(context.Item))
                         {
                             <Tooltip Fade Text="Modificar datos de póliza" Placement="TooltipPlacement.Top">
-                                <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked"  Disabled="context.Item.Validated">
+                                <Button Style="min-width: 1rem !important; background-color: transparent !important; box-shadow: none !important;" Outline Clicked="context.Clicked" Disabled="context.Item.Validated">
                                     <Icon Name="@("fas fa-edit")" IconStyle="IconStyle.DuoTone" IconSize="IconSize.Large" Class="icons-color"></Icon>
                                 </Button>
                             </Tooltip>

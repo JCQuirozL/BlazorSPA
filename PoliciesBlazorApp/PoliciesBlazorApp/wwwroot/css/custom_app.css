@@ -343,3 +343,7 @@ select {
 .text-info {
     color: var(--darkBlueBBVA) !important;
 }
+
+.custom-control{
+    padding-left: 1.5rem !important;
+}
